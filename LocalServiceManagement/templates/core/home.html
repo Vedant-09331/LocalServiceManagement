@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="bg-light py-5">
+<div class="container">
+
+<div class="row align-items-center">
+
+<div class="col-md-6">
+
+<h1 class="fw-bold display-5">
+Home Services at Your Doorstep
+</h1>
+
+<p class="text-muted mt-3">
+Book trusted electricians, plumbers, beauticians and cleaners easily.
+</p>
+
+<form class="mt-4">
+
+<div class="input-group">
+
+<input type="text" class="form-control form-control-lg"
+placeholder="Search for services...">
+
+<button class="btn btn-primary btn-lg">
+Search
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+<div class="col-md-6 text-center">
+
+<img src="{% static 'images/home-services.png' %}"
+class="img-fluid" style="max-height:350px;">
+
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- SERVICE CATEGORIES -->
+
+<section class="py-5">
+
+<div class="container">
+
+<h2 class="text-center mb-5 fw-bold">
+Popular Services
+</h2>
+
+<div class="row g-4">
+
+{% for service in services %}
+
+<div class="col-md-3">
+
+<div class="card shadow-sm border-0 text-center h-100">
+
+{% if service.image %}
+<img src="{{ service.image.url }}"
+class="card-img-top"
+style="height:180px; object-fit:cover;">
+{% endif %}
+
+<div class="card-body">
+
+<h5 class="card-title">
+{{ service.name }}
+</h5>
+
+<p class="text-muted small">
+{{ service.description|truncatewords:10 }}
+</p>
+
+<p class="fw-bold text-primary">
+₹{{ service.price }}
+</p>
+
+<a href="{% url 'service_detail' service.id %}"
+class="btn btn-outline-primary btn-sm">
+View Service
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- WHY CHOOSE US -->
+
+<section class="bg-light py-5">
+
+<div class="container">
+
+<h2 class="text-center fw-bold mb-5">
+Why Choose Us
+</h2>
+
+<div class="row text-center">
+
+<div class="col-md-4">
+
+<div class="p-4">
+
+<i class="fa-solid fa-user-check fa-3x text-primary mb-3"></i>
+
+<h5>Verified Professionals</h5>
+
+<p class="text-muted">
+All service providers are background checked and trained.
+</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="p-4">
+
+<i class="fa-solid fa-clock fa-3x text-primary mb-3"></i>
+
+<h5>On-Time Service</h5>
+
+<p class="text-muted">
+Book services instantly and get professionals at your doorstep.
+</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="p-4">
+
+<i class="fa-solid fa-star fa-3x text-primary mb-3"></i>
+
+<h5>Top Rated Services</h5>
+
+<p class="text-muted">
+Thousands of satisfied customers with excellent ratings.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CALL TO ACTION -->
+
+<section class="py-5 text-center">
+
+<div class="container">
+
+<h2 class="fw-bold">
+Need a service today?
+</h2>
+
+<p class="text-muted">
+Book a professional in just a few clicks.
+</p>
+
+<a href="{% url 'services_list' %}" class="btn btn-primary btn-lg mt-3">
+Browse Services
+</a>
+
+</div>
+
+</section>
+
+
+{% endblock %}

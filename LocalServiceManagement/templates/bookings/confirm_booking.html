@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="card shadow p-4">
+
+<h3 class="fw-bold mb-4">Booking Summary</h3>
+
+<p><strong>Service:</strong> {{ service.name }}</p>
+
+<p><strong>Professional:</strong> {{ professional.name }}</p>
+
+<p><strong>Price:</strong> ₹{{ service.price }}</p>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="mb-3">
+<label>Select Date</label>
+<input type="date" name="booking_date" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label>Service Address</label>
+<textarea name="address" class="form-control" required></textarea>
+</div>
+
+<button class="btn btn-primary">
+Proceed to Payment
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

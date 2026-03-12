@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Service Details{% endblock %}
+
+{% block content %}
+
+<!-- SERVICE HEADER -->
+
+<div class="row mb-5">
+
+<div class="col-md-6">
+
+{% if service.image %}
+<img src="{{ service.image.url }}" class="img-fluid rounded shadow">
+{% else %}
+<img src="https://via.placeholder.com/600x400" class="img-fluid rounded shadow">
+{% endif %}
+
+</div>
+
+<div class="col-md-6">
+
+<h2 class="fw-bold">{{ service.name }}</h2>
+
+<p class="text-muted mt-3">
+{{ service.description }}
+</p>
+
+<h4 class="text-primary fw-bold mt-3">
+₹{{ service.price }}
+</h4>
+
+<p class="rating">
+<i class="fa-solid fa-star"></i>
+4.8 Average Rating
+<h3 class="text-primary">₹{{ service.price }}</h3>
+
+<p class="text-warning">
+⭐ {{ service.average_rating }} Average Rating
+</p>
+
+<a href="{% url 'book_service' service.id %}" class="btn btn-primary btn-lg mt-3">
+    Book Appointment
+</a>
+</p>
+
+</div>
+
+</div>
+
+
+<!-- PROFESSIONALS SECTION -->
+
+<h3 class="fw-bold mb-4">
+Available Professionals
+</h3>
+
+<div class="row g-4">
+
+{% for professional in professionals %}
+
+<div class="col-md-4">
+
+<div class="card service-card h-100 text-center">
+
+<div class="card-body">
+
+{% if professional.photo %}
+<img src="{{ professional.photo.url }}"
+class="rounded-circle mb-3"
+style="width:100px;height:100px;object-fit:cover;">
+{% else %}
+<img src="https://via.placeholder.com/100"
+class="rounded-circle mb-3">
+{% endif %}
+
+<h5 class="fw-bold">
+{{ professional.name }}
+</h5>
+
+<p class="text-muted mb-1">
+Experience: {{ professional.experience }} years
+</p>
+
+<p class="rating">
+<i class="fa-solid fa-star"></i>
+{{ professional.rating }}
+</p>
+
+<p class="text-muted small">
+Jobs Completed: {{ professional.jobs_completed }}
+</p>
+
+<a href="{% url 'book_service' service.id professional.id %}"
+class="btn btn-primary mt-2">
+
+Book Now
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No professionals available for this service.</p>
+
+{% endfor %}
+
+</div>
+
+
+<!-- CUSTOMER REVIEWS -->
+
+<div class="mt-5">
+
+<h3 class="fw-bold mb-4">
+Customer Reviews
+</h3>
+
+{% for review in reviews %}
+
+<div class="card mb-3">
+
+<div class="card-body">
+
+<strong>{{ review.user.username }}</strong>
+
+<p class="rating mb-1">
+
+{% for i in "12345"|slice:":review.rating" %}
+<i class="fa-solid fa-star"></i>
+{% endfor %}
+
+</p>
+
+<p class="text-muted">
+{{ review.comment }}
+</p>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No reviews yet.</p>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

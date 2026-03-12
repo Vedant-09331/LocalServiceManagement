@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="card shadow p-4">
+
+<h3 class="fw-bold mb-4">Payment</h3>
+
+<p><strong>Service:</strong> {{ booking.service.name }}</p>
+<p><strong>Amount:</strong> ₹{{ booking.service.price }}</p>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="mb-3">
+
+<label class="form-label">Select Payment Method</label>
+
+<select name="payment_method" class="form-control">
+
+<option value="upi">UPI</option>
+<option value="card">Card</option>
+<option value="cash">Cash on Service</option>
+
+</select>
+
+</div>
+
+<button class="btn btn-success">
+Pay Now
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold fs-4" href="/">
+            🚀 Local Services
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                {% if user.is_authenticated %}
+
+                <!-- Services -->
+                <li class="nav-item">
+                    <a class="nav-link px-3" href="{% url 'services' %}">
+                        🛠 Services
+                    </a>
+                </li>
+
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a class="nav-link px-3" href="{% url 'dashboard' %}">
+                        📊 Dashboard
+                    </a>
+                </li>
+
+                <!-- Booking History -->
+                <li class="nav-item">
+                    <a class="nav-link text-info" href="{% url 'booking_history' %}">
+                My Bookings
+                </a>
+                </li>
+
+                <!-- User Greeting -->
+                <li class="nav-item me-3">
+                    <span class="navbar-text text-light">
+                        👋 Hi, {{ user.username }}
+                    </span>
+                </li>
+
+                <!-- Logout -->
+                <li class="nav-item">
+                    <a class="btn btn-warning btn-sm px-3" href="{% url 'logout' %}">
+                        Logout
+                    </a>
+                </li>
+
+                {% else %}
+
+                <!-- Login -->
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="{% url 'login' %}">
+                        Login
+                    </a>
+                </li>
+
+                <!-- Signup -->
+                <li class="nav-item">
+                    <a class="btn btn-warning btn-sm px-3" href="{% url 'signup' %}">
+                        Sign Up
+                    </a>
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+    </div>
+</nav>

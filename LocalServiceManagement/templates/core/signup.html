@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Sign Up | Local Service Management{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="glass-card">
+
+        <h2 class="text-center mb-1">Create account</h2>
+        <p class="text-center mb-4">Get started with Local Service Management</p>
+
+        {% if error %}
+            <div class="alert alert-danger text-center">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="you@example.com"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Confirm password</label>
+                <input type="password"
+                       name="password2"
+                       class="form-control"
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Create Account
+            </button>
+        </form>
+
+        <p class="text-center mt-4 mb-0">
+            Already have an account?
+            <a href="{% url 'login' %}" class="fw-semibold text-decoration-none">
+                Sign in
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

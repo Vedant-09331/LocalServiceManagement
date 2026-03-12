@@ -1,0 +1,35 @@
+<h2>Vendor Dashboard</h2>
+
+<h3>Your Services</h3>
+
+<ul>
+
+{% for service in services %}
+
+<li>{{ service.title }} - ₹{{ service.price }}</li>
+
+{% endfor %}
+
+</ul>
+
+<h3>Service Bookings</h3>
+
+<table>
+
+<tr>
+<th>User</th>
+<th>Service</th>
+<th>Status</th>
+</tr>
+
+{% for booking in bookings %}
+
+<tr>
+<td>{{ booking.user.email }}</td>
+<td>{{ booking.service.title }}</td>
+<td>{{ booking.status }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
