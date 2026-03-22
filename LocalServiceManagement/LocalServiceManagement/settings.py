@@ -21,11 +21,11 @@ SECRET_KEY = os.getenv(
     'django-insecure-x3lg_=q&mb0^ggb&%q#kt)d5m0oz@(7077zkfd)*m2kfv7phl8'
 )
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
-    'localhost,127.0.0.1'
+    'localhost,127.0.0.1,.onrender.com'
 ).split(',')
 
 
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',   # 
+    'django.contrib.messages',
     'django.contrib.staticfiles',
 
     # Third-party
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # ✅ Add this for production static files
+    # WhiteNoise for static files
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -70,8 +70,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-
-    # ✅ messages middleware (IMPORTANT)
     'django.contrib.messages.middleware.MessageMiddleware',
 
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,7 +77,7 @@ MIDDLEWARE = [
 
 
 # ======================
-# TEMPLATES
+# URLS & TEMPLATES
 # ======================
 
 ROOT_URLCONF = 'LocalServiceManagement.urls'
@@ -93,8 +91,6 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-
-                # ✅ messages context processor
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -126,10 +122,6 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'core.User'
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
 LOGIN_URL = 'core:login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -140,18 +132,10 @@ LOGOUT_REDIRECT_URL = '/'
 # ======================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
@@ -160,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ======================
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'   # ✅ better for you
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
@@ -169,10 +153,9 @@ USE_TZ = True
 # STATIC & MEDIA FILES
 # ======================
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise config
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
@@ -180,7 +163,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # ======================
-# DJANGO DEFAULTS
+# DEFAULTS
 # ======================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -210,7 +193,7 @@ RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'your_razorpay_key_secret
 
 
 # ======================
-# SECURITY (Production Ready)
+# SECURITY (PRODUCTION)
 # ======================
 
 if not DEBUG:
