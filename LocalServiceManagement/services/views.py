@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg
-from .models import Review, Service
+from urllib3 import request
+from .models import Favorite, Review, Service, Category
 from .forms import ServiceForm
 from professionals.models import Professional
 
@@ -39,23 +40,39 @@ def vendor_services(request):
 
 def services_list(request):
     """
-    Display list of all services with search and pagination.
-    Supports query parameter 'q' for searching by service name.
+    Display list of all services with search, location filter and pagination.
     """
+
     query = request.GET.get('q', '')
-    
+    category_id = request.GET.get('category', '')
+    sort = request.GET.get('sort', '')
+
+    services = Service.objects.all()
+
     if query:
-        services = Service.objects.filter(name__icontains=query)
-    else:
-        services = Service.objects.all()
-    
+        services = services.filter(name__icontains=query) | services.filter(description__icontains=query)
+    if category_id:
+        services = services.filter(category_id=category_id)
+
+    if sort == 'price_asc':
+        services = services.order_by('price')
+    elif sort == 'price_desc':
+        services = services.order_by('-price')
+    elif sort == 'rating':
+        services = services.order_by('-rating')
+
+    categories = Category.objects.all()
+
     paginator = Paginator(services, 12)  # 12 per page
     page = request.GET.get('page')
     services = paginator.get_page(page)
-    
+
     return render(request, 'services/services.html', {
         'services': services,
-        'query': query
+        'query': query,
+        'category_id': category_id,
+        'sort': sort,
+        'categories': categories
     })
 
 def service_detail(request, service_id):
@@ -63,14 +80,23 @@ def service_detail(request, service_id):
     service = get_object_or_404(Service, id=service_id)
 
     professionals = Professional.objects.filter(service=service)
-
     reviews = Review.objects.filter(service=service)
 
-    return render(request,"services/service_detail.html",{
-        "service":service,
-        "professionals":professionals,
-        "reviews":reviews
+    # ✅ FAVORITE LOGIC
+    is_favorite = False
+    if request.user.is_authenticated:
+        is_favorite = Favorite.objects.filter(
+            user=request.user,
+            service=service
+        ).exists()
+
+    return render(request, "services/service_detail.html", {
+        "service": service,
+        "professionals": professionals,
+        "reviews": reviews,
+        "is_favorite": is_favorite   # ✅ pass to template
     })
+
 def calculate_service_rating(service):
     """Aggregate reviews and update service rating"""
     if service.review_set.exists():
@@ -78,3 +104,81 @@ def calculate_service_rating(service):
         service.rating = avg
         service.rating_count = service.review_set.count()
         service.save()
+
+@login_required
+def edit_service(request, service_id):
+    service = Service.objects.get(id=service_id, vendor=request.user.vendor)
+    if request.method == "POST":
+        form = ServiceForm(request.POST, request.FILES, instance=service)
+        if form.is_valid():
+            form.save()
+            return redirect('vendor_services')
+    else:
+        form = ServiceForm(instance=service)
+    return render(request, 'services/edit_service.html', {'form': form})
+
+@login_required
+def delete_service(request, service_id):
+    service = Service.objects.get(id=service_id, vendor=request.user.vendor)
+    service.delete()
+    return redirect('vendor_services')
+
+@login_required
+def add_review(request, service_id):
+    service = Service.objects.get(id=service_id)
+
+    if request.method == "POST":
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+
+        Review.objects.create(
+            service=service,
+            user=request.user,
+            rating=rating,
+            comment=comment
+        )
+
+        return redirect('service_detail', service_id=service.id)
+
+    return render(request, 'services/add_review.html', {'service': service}) 
+
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+
+    if request.method == "POST":
+        review.rating = request.POST.get('rating')
+        review.comment = request.POST.get('comment')
+        review.save()
+        return redirect('service_detail', service_id=review.service.id)
+
+    return render(request, 'services/edit_review.html', {'review': review})
+
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    service_id = review.service.id
+    review.delete()
+    return redirect('service_detail', service_id=service_id)
+
+@login_required
+def toggle_favorite(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+
+    favorite, created = Favorite.objects.get_or_create(
+        user=request.user,
+        service=service
+    )
+
+    if not created:
+        favorite.delete()  # remove if already exists
+
+    return redirect('services:service_detail', service_id=service.id)
+
+@login_required
+def favorite_list(request):
+    favorites = Favorite.objects.filter(user=request.user)
+    return render(request, "services/favorite_list.html", {
+        "favorites": favorites
+    })

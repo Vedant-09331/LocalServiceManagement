@@ -35,6 +35,23 @@ Proceed to Payment
 
 </div>
 
+<!-- Reviews Section -->
+<div class="mt-5">
+    <h4 class="fw-bold">Customer Reviews</h4>
+    {% if reviews %}
+        <ul class="list-group">
+            {% for review in reviews %}
+                <li class="list-group-item">
+                    <strong>{{ review.user.username }}</strong>: {{ review.comment }}
+                    <span class="text-warning">{{ review.rating }} ★</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews available for this service.</p>
+    {% endif %}
+</div>
+
 </div>
 
 {% endblock %}

@@ -1,46 +1,453 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
+{% block title %}My Dashboard | LocalServices{% endblock %}
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-body text-center">
-            <h2 class="mb-3">👤 User Dashboard</h2>
-            <p class="text-muted">Welcome, {{ request.user.email }}</p>
-            <p>Your Role: <strong>{{ request.user.role }}</strong></p>
+{% block content %}
+<style>
+/* ── Reset for dashboard ───────────────────────────────────── */
+.ud-wrap { font-family:'Poppins',sans-serif; padding-bottom:60px; }
 
-            <hr>
+/* ── Stat cards ────────────────────────────────────────────── */
+.ud-stat {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+  transition: transform .25s, box-shadow .25s;
+  border: 1px solid #f1f5f9;
+}
+.ud-stat:hover { transform:translateY(-4px); box-shadow:0 10px 28px rgba(0,0,0,0.11); }
+.ud-stat-left {}
+.ud-stat-label { font-size:.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.5px; }
+.ud-stat-value { font-size:2rem; font-weight:700; color:#1e293b; line-height:1.1; }
+.ud-stat-sub   { font-size:.78rem; color:#94a3b8; margin-top:1px; }
+.ud-stat-icon  {
+  width:52px; height:52px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem;
+}
+.icon-blue   { background:#eff6ff; color:#2563eb; }
+.icon-green  { background:#f0fdf4; color:#16a34a; }
+.icon-amber  { background:#fffbeb; color:#d97706; }
+.icon-yellow { background:#fefce8; color:#ca8a04; }
 
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card p-3 shadow-sm">
-                        <h5>My Profile</h5>
-                        <p>View and update your details</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card p-3 shadow-sm">
-                        <h5>My Services</h5>
-                        <p>Track booked services</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card p-3 shadow-sm">
-                        <h5>Settings</h5>
-                        <p>Manage account settings</p>
-                    </div>
-                </div>
-            </div>
+/* ── Section title ─────────────────────────────────────────── */
+.ud-section-title {
+  font-size:1.05rem; font-weight:700; color:#1e293b;
+  margin-bottom:16px; padding-bottom:10px;
+  border-bottom:2px solid #f1f5f9;
+  display:flex; align-items:center; gap:8px;
+}
 
-            <a href="{% url 'logout' %}" class="btn btn-danger mt-4">Logout</a>
-        </div>
+/* ── Panel ─────────────────────────────────────────────────── */
+.ud-panel {
+  background:white; border-radius:18px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.07);
+  padding:22px 24px;
+  border: 1px solid #f1f5f9;
+  height:100%;
+}
+
+/* ── Bookings table ────────────────────────────────────────── */
+.ud-table { width:100%; border-collapse:collapse; }
+.ud-table thead th {
+  font-size:.72rem; font-weight:600; color:#64748b;
+  text-transform:uppercase; letter-spacing:.5px;
+  padding:9px 12px; background:#f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+.ud-table tbody tr { transition:background .15s; }
+.ud-table tbody tr:hover { background:#f8faff; }
+.ud-table tbody td {
+  padding:13px 12px; font-size:.86rem; color:#374151;
+  border-bottom:1px solid #f1f5f9; vertical-align:middle;
+}
+.ud-service-cell { display:flex; align-items:center; gap:10px; }
+.ud-service-thumb {
+  width:38px; height:38px; border-radius:10px;
+  object-fit:cover; background:#e2e8f0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.85rem; color:#94a3b8; flex-shrink:0; overflow:hidden;
+}
+.ud-service-thumb img { width:100%; height:100%; object-fit:cover; }
+.ud-service-name { font-weight:600; color:#1e293b; font-size:.88rem; }
+.ud-provider     { font-size:.78rem; color:#94a3b8; }
+
+/* ── Status badges ─────────────────────────────────────────── */
+.bst {
+  padding:4px 11px; border-radius:20px;
+  font-size:.72rem; font-weight:700;
+  display:inline-flex; align-items:center; gap:5px;
+  white-space:nowrap;
+}
+.bst-pending   { background:#fef3c7; color:#d97706; }
+.bst-confirmed { background:#dcfce7; color:#16a34a; }
+.bst-completed { background:#dbeafe; color:#2563eb; }
+.bst-cancelled { background:#fee2e2; color:#dc2626; }
+
+/* ── Browse services panel ─────────────────────────────────── */
+.ud-search {
+  display:flex; align-items:center; gap:8px;
+  background:#f8fafc; border-radius:12px;
+  padding:10px 14px; margin-bottom:14px;
+  border:1px solid #e2e8f0;
+}
+.ud-search input {
+  border:none; background:transparent; outline:none;
+  font-size:.88rem; width:100%; color:#374151;
+}
+.ud-search i { color:#94a3b8; }
+
+.ud-cat-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.ud-chip {
+  padding:5px 14px; border-radius:20px; font-size:.75rem;
+  font-weight:600; cursor:pointer; border:1.5px solid #e2e8f0;
+  color:#64748b; background:white; transition:.2s;
+  text-decoration:none; display:inline-block;
+}
+.ud-chip:hover, .ud-chip.active {
+  background:#2563eb; color:white; border-color:#2563eb;
+}
+
+.ud-service-card {
+  display:flex; align-items:center; gap:14px;
+  background:#f8fafc; border-radius:14px;
+  padding:14px; border:1px solid #f1f5f9;
+  transition:.2s;
+}
+.ud-service-card:hover { background:#eff6ff; border-color:#bfdbfe; }
+.ud-service-img {
+  width:64px; height:64px; border-radius:12px;
+  object-fit:cover; background:#e2e8f0; flex-shrink:0;
+}
+.ud-service-info { flex:1; }
+.ud-service-info h6 { font-size:.88rem; font-weight:700; margin:0; color:#1e293b; }
+.ud-service-info .provider-name { font-size:.75rem; color:#94a3b8; }
+.ud-service-info .price-row { margin-top:4px; display:flex; align-items:center; gap:10px; }
+.ud-price { font-size:.95rem; font-weight:700; color:#2563eb; }
+.ud-rating { font-size:.73rem; color:#d97706; }
+.btn-book-now {
+  background:linear-gradient(135deg,#2563eb,#06b6d4);
+  color:white; border:none; border-radius:10px;
+  padding:7px 14px; font-size:.78rem; font-weight:600;
+  cursor:pointer; transition:.2s; white-space:nowrap;
+  text-decoration:none; display:inline-block;
+}
+.btn-book-now:hover { opacity:.88; color:white; }
+
+/* ── Payment history ───────────────────────────────────────── */
+.pay-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0; border-bottom:1px solid #f1f5f9;
+}
+.pay-row:last-child { border-bottom:none; }
+.pay-name { font-weight:600; font-size:.88rem; color:#1e293b; }
+.pay-date { font-size:.76rem; color:#94a3b8; }
+.bst-paid     { background:#dcfce7; color:#166534; }
+.bst-refunded { background:#ede9fe; color:#6d28d9; }
+.bst-unpaid   { background:#fef3c7; color:#92400e; }
+
+/* ── View all link ─────────────────────────────────────────── */
+.ud-view-all {
+  display:flex; justify-content:flex-end; margin-top:14px;
+}
+.ud-view-all a {
+  font-size:.8rem; font-weight:600; color:#2563eb;
+  text-decoration:none; display:flex; align-items:center; gap:4px;
+}
+.ud-view-all a:hover { color:#1d4ed8; }
+
+/* ── Empty state ───────────────────────────────────────────── */
+.ud-empty { text-align:center; padding:30px; color:#94a3b8; }
+.ud-empty i { font-size:2rem; margin-bottom:8px; display:block; }
+
+/* ── Top greeting ──────────────────────────────────────────── */
+.ud-greeting {
+  background:linear-gradient(135deg,#1e3a8a,#2563eb,#0891b2);
+  border-radius:18px; padding:22px 28px; color:white;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px;
+  box-shadow:0 8px 30px rgba(37,99,235,0.3);
+}
+.ud-greeting h5 { font-weight:700; font-size:1.15rem; margin:0; }
+.ud-greeting p  { font-size:.85rem; opacity:.85; margin:4px 0 0; }
+.ud-greeting-right { display:flex; align-items:center; gap:14px; }
+.ud-greeting-avatar {
+  width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; border:2px solid rgba(255,255,255,.4);
+}
+.ud-bell-wrap { position:relative; cursor:pointer; font-size:1.2rem; color:rgba(255,255,255,.85); }
+.ud-bell-dot {
+  position:absolute; top:-5px; right:-5px;
+  background:#f87171; color:white; font-size:.58rem; font-weight:700;
+  border-radius:50%; width:15px; height:15px;
+  display:flex; align-items:center; justify-content:center;
+}
+</style>
+
+<div class="ud-wrap">
+
+  <!-- ── Greeting bar ───────────────────────────────────── -->
+  <div class="ud-greeting">
+    <div>
+      <h5>Hi, {{ request.user.get_full_name|default:request.user.email }}! 👋</h5>
+      <p>Welcome back to your service dashboard.</p>
     </div>
-</div>
+    <div class="ud-greeting-right">
+      <div class="ud-bell-wrap">
+        <i class="fa-solid fa-bell"></i>
+        {% if upcoming_count > 0 %}
+        <span class="ud-bell-dot">{{ upcoming_count }}</span>
+        {% endif %}
+      </div>
+      <i class="fa-solid fa-envelope" style="font-size:1.2rem;color:rgba(255,255,255,.8);"></i>
+      <div class="ud-greeting-avatar"><i class="fa-solid fa-user fa-sm"></i></div>
+    </div>
+  </div>
 
-</body>
-</html>
+  <!-- ── Stat cards ─────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="ud-stat">
+        <div class="ud-stat-left">
+          <div class="ud-stat-label">Upcoming Bookings</div>
+          <div class="ud-stat-value">{{ upcoming_count }}</div>
+          <div class="ud-stat-sub">Scheduled</div>
+        </div>
+        <div class="ud-stat-icon icon-blue">
+          <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="ud-stat">
+        <div class="ud-stat-left">
+          <div class="ud-stat-label">Past Bookings</div>
+          <div class="ud-stat-value">{{ past_count }}</div>
+          <div class="ud-stat-sub">Completed</div>
+        </div>
+        <div class="ud-stat-icon icon-green">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="ud-stat">
+        <div class="ud-stat-left">
+          <div class="ud-stat-label">Total Bookings</div>
+          <div class="ud-stat-value">{{ bookings.count }}</div>
+          <div class="ud-stat-sub">All time</div>
+        </div>
+        <div class="ud-stat-icon icon-amber">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="ud-stat">
+        <div class="ud-stat-left">
+          <div class="ud-stat-label">Loyalty Points</div>
+          <div class="ud-stat-value">{{ past_count|add:past_count }}</div>
+          <div class="ud-stat-sub">Points</div>
+        </div>
+        <div class="ud-stat-icon icon-yellow">
+          <i class="fa-solid fa-star"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main content: 2 columns ───────────────────────── -->
+  <div class="row g-4">
+
+    <!-- LEFT col -->
+    <div class="col-lg-5 d-flex flex-column gap-4">
+
+      <!-- Browse Services -->
+      <div class="ud-panel">
+        <div class="ud-section-title">
+          <i class="fa-solid fa-compass" style="color:#2563eb;"></i> Browse Services
+        </div>
+
+        <!-- Search bar -->
+        <form method="GET" action="{% url 'services:services_list' %}">
+          <div class="ud-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" placeholder="Search for services...">
+            <i class="fa-solid fa-location-dot" style="color:#2563eb;cursor:pointer;"></i>
+          </div>
+        </form>
+
+        <!-- Category chips -->
+        <div class="ud-cat-chips">
+          <a href="{% url 'services:services_list' %}" class="ud-chip active">All</a>
+          {% for cat in categories|slice:"4" %}
+          <a href="{% url 'services:services_list' %}?category={{ cat.id }}" class="ud-chip">
+            {{ cat.name }}
+          </a>
+          {% endfor %}
+        </div>
+
+        <!-- Featured service card -->
+        {% with services|first as svc %}
+        {% if svc %}
+        <div class="ud-service-card">
+          {% if svc.image %}
+            <img src="{{ svc.image.url }}" class="ud-service-img" alt="{{ svc.title }}">
+          {% else %}
+            <div class="ud-service-img d-flex align-items-center justify-content-center">
+              <i class="fa-solid fa-wrench fa-lg" style="color:#94a3b8;"></i>
+            </div>
+          {% endif %}
+          <div class="ud-service-info">
+            <h6>{{ svc.title }}</h6>
+            <div class="provider-name">{{ svc.category.name }}</div>
+            <div class="price-row">
+              <span class="ud-price">₹{{ svc.price }}</span>
+              <span class="ud-rating">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= svc.rating %}
+                    <i class="fa-solid fa-star"></i>
+                  {% else %}
+                    <i class="fa-regular fa-star"></i>
+                  {% endif %}
+                {% endfor %}
+                ({{ svc.rating_count }})
+              </span>
+            </div>
+          </div>
+          <a href="{% url 'services:service_detail' svc.id %}" class="btn-book-now">Book Now</a>
+        </div>
+        {% else %}
+        <div class="ud-empty">
+          <i class="fa-regular fa-face-meh"></i>
+          <p class="mb-0">No services available right now.</p>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="ud-view-all">
+          <a href="{% url 'services:services_list' %}">View All Services <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT col -->
+    <div class="col-lg-7 d-flex flex-column gap-4">
+
+      <!-- Upcoming Bookings table -->
+      <div class="ud-panel">
+        <div class="ud-section-title">
+          <i class="fa-solid fa-calendar-check" style="color:#16a34a;"></i> Upcoming Bookings
+        </div>
+
+        {% if upcoming_bookings %}
+        <div class="table-responsive">
+          <table class="ud-table">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Provider</th>
+                <th>Date &amp; Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bk in upcoming_bookings %}
+              <tr>
+                <td>
+                  <div class="ud-service-cell">
+                    <div class="ud-service-thumb">
+                      {% if bk.service.image %}
+                        <img src="{{ bk.service.image.url }}" alt="">
+                      {% else %}
+                        <i class="fa-solid fa-wrench"></i>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <div class="ud-service-name">{{ bk.service.title }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {% if bk.vendor %}
+                    {{ bk.vendor.user.get_full_name|default:bk.vendor.user.email }}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td style="white-space:nowrap; font-size:.82rem;">
+                  {{ bk.booking_date|date:"M j, Y" }}
+                  {% if bk.booking_time %}<br><span style="color:#94a3b8;">{{ bk.booking_time|time:"g:i A" }}</span>{% endif %}
+                </td>
+                <td>
+                  <span class="bst
+                    {% if bk.status == 'pending' %}bst-pending
+                    {% elif bk.status == 'confirmed' %}bst-confirmed
+                    {% elif bk.status == 'completed' %}bst-completed
+                    {% elif bk.status == 'cancelled' %}bst-cancelled
+                    {% endif %}">
+                    {{ bk.status|capfirst }}
+                    {% if bk.status == 'pending' %}<i class="fa-solid fa-chevron-right fa-xs"></i>{% endif %}
+                    {% if bk.status == 'confirmed' %}<i class="fa-solid fa-check fa-xs"></i>{% endif %}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="ud-empty">
+          <i class="fa-regular fa-calendar-xmark"></i>
+          <p class="mb-0">No upcoming bookings. <a href="{% url 'services:services_list' %}">Book a service</a> today!</p>
+        </div>
+        {% endif %}
+
+        <div class="ud-view-all">
+          <a href="{% url 'bookings:booking_history' %}">View All <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Payment History -->
+      <div class="ud-panel">
+        <div class="ud-section-title">
+          <i class="fa-solid fa-credit-card" style="color:#7c3aed;"></i> Payment History
+        </div>
+
+        {% if recent_bookings %}
+          {% for bk in recent_bookings %}
+          <div class="pay-row">
+            <div>
+              <div class="pay-name">{{ bk.service.title }}</div>
+              <div class="pay-date">{{ bk.booking_date|date:"M j, Y" }}</div>
+            </div>
+            <span class="bst
+              {% if bk.payment_status == 'paid' %}bst-paid
+              {% else %}bst-unpaid{% endif %}">
+              {{ bk.payment_status|capfirst }}
+              <i class="fa-solid fa-chevron-right fa-xs"></i>
+            </span>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="ud-empty">
+          <i class="fa-regular fa-credit-card"></i>
+          <p class="mb-0">No payment history yet.</p>
+        </div>
+        {% endif %}
+
+        <div class="ud-view-all">
+          <a href="{% url 'bookings:booking_history' %}">View All <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

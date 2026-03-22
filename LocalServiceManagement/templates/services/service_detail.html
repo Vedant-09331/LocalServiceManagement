@@ -4,18 +4,17 @@
 
 {% block content %}
 
-<!-- SERVICE HEADER -->
+<div class="container py-5">
 
-<div class="row mb-5">
+<!-- SERVICE HEADER -->
+<div class="row mb-5 align-items-center">
 
 <div class="col-md-6">
-
 {% if service.image %}
-<img src="{{ service.image.url }}" class="img-fluid rounded shadow">
+<img src="{{ service.image.url }}" class="img-fluid rounded shadow service-img">
 {% else %}
 <img src="https://via.placeholder.com/600x400" class="img-fluid rounded shadow">
 {% endif %}
-
 </div>
 
 <div class="col-md-6">
@@ -26,76 +25,37 @@
 {{ service.description }}
 </p>
 
-<h4 class="text-primary fw-bold mt-3">
+<h3 class="text-primary fw-bold">
 ₹{{ service.price }}
-</h4>
-
-<p class="rating">
-<i class="fa-solid fa-star"></i>
-4.8 Average Rating
-<h3 class="text-primary">₹{{ service.price }}</h3>
-
-<p class="text-warning">
-⭐ {{ service.average_rating }} Average Rating
-</p>
-
-<a href="{% url 'book_service' service.id %}" class="btn btn-primary btn-lg mt-3">
-    Book Appointment
-</a>
-</p>
-
-</div>
-
-</div>
-
-
-<!-- PROFESSIONALS SECTION -->
-
-<h3 class="fw-bold mb-4">
-Available Professionals
 </h3>
 
-<div class="row g-4">
-
-{% for professional in professionals %}
-
-<div class="col-md-4">
-
-<div class="card service-card h-100 text-center">
-
-<div class="card-body">
-
-{% if professional.photo %}
-<img src="{{ professional.photo.url }}"
-class="rounded-circle mb-3"
-style="width:100px;height:100px;object-fit:cover;">
-{% else %}
-<img src="https://via.placeholder.com/100"
-class="rounded-circle mb-3">
-{% endif %}
-
-<h5 class="fw-bold">
-{{ professional.name }}
-</h5>
-
-<p class="text-muted mb-1">
-Experience: {{ professional.experience }} years
+<!-- Rating -->
+<p class="text-warning fs-5 mb-2">
+{% for i in "12345" %}
+    {% if forloop.counter <= service.average_rating %}
+        ⭐
+    {% else %}
+        ☆
+    {% endif %}
+{% endfor %}
+<span class="text-muted fs-6">({{ reviews|length }} reviews)</span>
 </p>
 
-<p class="rating">
-<i class="fa-solid fa-star"></i>
-{{ professional.rating }}
-</p>
+<!-- ACTION BUTTONS -->
+<div class="mt-4 d-flex gap-3">
 
-<p class="text-muted small">
-Jobs Completed: {{ professional.jobs_completed }}
-</p>
-
-<a href="{% url 'book_service' service.id professional.id %}"
-class="btn btn-primary mt-2">
-
+<a href="{% url 'bookings:book_service' service.id %}" 
+class="btn btn-primary btn-lg px-4">
 Book Now
+</a>
 
+<a href="{% url 'services:toggle_favorite' service.id %}" 
+class="btn btn-lg {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %}">
+{% if is_favorite %}
+❤️ Saved
+{% else %}
+🤍 Save
+{% endif %}
 </a>
 
 </div>
@@ -104,17 +64,33 @@ Book Now
 
 </div>
 
-{% empty %}
+<!-- SERVICE HIGHLIGHTS (NEW FEATURE) -->
+<div class="row text-center mb-5">
 
-<p>No professionals available for this service.</p>
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>⚡ Fast Service</h5>
+<p class="text-muted small">Quick and reliable service at your doorstep</p>
+</div>
+</div>
 
-{% endfor %}
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>✅ Verified Experts</h5>
+<p class="text-muted small">Trained & background-checked professionals</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>🔒 Secure Payment</h5>
+<p class="text-muted small">100% safe and secure transactions</p>
+</div>
+</div>
 
 </div>
 
-
 <!-- CUSTOMER REVIEWS -->
-
 <div class="mt-5">
 
 <h3 class="fw-bold mb-4">
@@ -123,23 +99,30 @@ Customer Reviews
 
 {% for review in reviews %}
 
-<div class="card mb-3">
+<div class="card mb-3 review-card">
 
 <div class="card-body">
 
+<div class="d-flex justify-content-between">
 <strong>{{ review.user.username }}</strong>
-
-<p class="rating mb-1">
-
-{% for i in "12345"|slice:":review.rating" %}
-<i class="fa-solid fa-star"></i>
+<span class="text-warning">
+{% for i in "12345" %}
+    {% if forloop.counter <= review.rating %}
+        ⭐
+    {% else %}
+        ☆
+    {% endif %}
 {% endfor %}
+</span>
+</div>
 
-</p>
-
-<p class="text-muted">
+<p class="text-muted mt-2 mb-1">
 {{ review.comment }}
 </p>
+
+<small class="text-muted">
+Posted on {{ review.created_at|date:"M d, Y" }}
+</small>
 
 </div>
 
@@ -147,10 +130,48 @@ Customer Reviews
 
 {% empty %}
 
-<p>No reviews yet.</p>
+<div class="text-center text-muted">
+<h5>No reviews yet 😕</h5>
+<p>Be the first to review this service!</p>
+</div>
 
 {% endfor %}
 
 </div>
+
+</div>
+
+<!-- CUSTOM STYLES -->
+<style>
+
+.service-img{
+transition:0.3s;
+}
+.service-img:hover{
+transform:scale(1.05);
+}
+
+/* Highlight Section */
+.highlight-box{
+border-radius:12px;
+background:#f8f9fa;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+transition:0.3s;
+}
+.highlight-box:hover{
+transform:translateY(-5px);
+}
+
+/* Review Cards */
+.review-card{
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+transition:0.3s;
+}
+.review-card:hover{
+transform:scale(1.01);
+}
+
+</style>
 
 {% endblock %}

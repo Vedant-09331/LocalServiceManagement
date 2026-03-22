@@ -1,0 +1,38 @@
+<h3>Reviews</h3>
+
+<h3 class="fw-bold mb-4">Customer Reviews</h3>
+
+{% for review in service.reviews.all %}
+
+<div class="card mb-3 review-card">
+<div class="card-body">
+
+<strong>{{ review.user.username }}</strong>
+
+<p class="text-warning">
+
+{% for i in "12345" %}
+    {% if forloop.counter <= review.rating %}
+        ★
+    {% else %}
+        ☆
+    {% endif %}
+{% endfor %}
+
+</p>
+
+<p>{{ review.comment }}</p>
+
+{% if review.user == request.user %}
+    <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-warning">Edit</a>
+    <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-danger">Delete</a>
+{% endif %}
+
+</div>
+</div>
+
+{% empty %}
+<p>No reviews yet.</p>
+{% endfor %}
+
+<a href="{% url 'add_review' service.id %}">Write a Review</a>

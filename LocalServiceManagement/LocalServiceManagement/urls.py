@@ -21,10 +21,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
-    path('services/', include('services.urls')),
-    path('bookings/', include('bookings.urls')),
-    path("payments/", include("payments.urls")),
+    path('', include(('core.urls', 'core'), namespace='core')),
+    path('services/', include(('services.urls', 'services'), namespace='services')),
+    path('bookings/', include(('bookings.urls', 'bookings'), namespace='bookings')),
+    path("payments/", include(("payments.urls", "payments"), namespace="payments")),
+    path('vendors/', include('vendors.urls')),
 ]
 
 # Serve media files during development

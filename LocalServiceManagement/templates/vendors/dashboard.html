@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% block title %}Vendor Dashboard | LocalServices{% endblock %}
+
+{% block content %}
+
+<style>
+/* ── Dashboard wrapper ─────────────────────────────────────── */
+.vd-wrapper {
+  font-family: 'Poppins', sans-serif;
+  background: #eef2f7;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── Top bar ───────────────────────────────────────────────── */
+.vd-topbar {
+  background: linear-gradient(135deg, #2d3a5f, #3b4f83);
+  color: white;
+  padding: 16px 28px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 30px rgba(45,58,95,0.35);
+}
+.vd-topbar h4 {
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 0;
+  letter-spacing: 0.4px;
+}
+.vd-topbar .vd-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.vd-topbar .vd-user span {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.vd-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.5);
+}
+.vd-avatar-placeholder {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+.vd-bell {
+  position: relative;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.85);
+}
+.vd-bell .badge-dot {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  background: #f87171;
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Stat cards ────────────────────────────────────────────── */
+.vd-stat-card {
+  border-radius: 16px;
+  padding: 22px 24px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.vd-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+}
+.vd-stat-card::after {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  bottom: -20px;
+  right: -20px;
+}
+.vd-stat-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.88;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.vd-stat-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.vd-stat-icon {
+  font-size: 1.4rem;
+  opacity: 0.7;
+  position: absolute;
+  top: 18px;
+  right: 22px;
+}
+
+.bg-stat-blue   { background: linear-gradient(135deg,#2563eb,#3b82f6); }
+.bg-stat-green  { background: linear-gradient(135deg,#16a34a,#22c55e); }
+.bg-stat-yellow { background: linear-gradient(135deg,#d97706,#f59e0b); }
+.bg-stat-purple { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+
+/* ── Panel card ────────────────────────────────────────────── */
+.vd-panel {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  padding: 24px 26px;
+  height: 100%;
+}
+.vd-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e2a4a;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* ── Bookings table ────────────────────────────────────────── */
+.vd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.vd-table thead th {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+.vd-table tbody tr {
+  transition: background 0.2s;
+}
+.vd-table tbody tr:hover {
+  background: #f8faff;
+}
+.vd-table tbody td {
+  padding: 13px 14px;
+  font-size: 0.88rem;
+  color: #374151;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.client-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* ── Status badges ─────────────────────────────────────────── */
+.badge-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: capitalize;
+}
+.badge-pending   { background:#fef3c7; color:#d97706; }
+.badge-confirmed { background:#dcfce7; color:#16a34a; }
+.badge-completed { background:#dbeafe; color:#2563eb; }
+.badge-cancelled { background:#fee2e2; color:#dc2626; }
+
+/* ── Action buttons ────────────────────────────────────────── */
+.btn-accept {
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-accept:hover { background:#15803d; color:white; }
+
+.btn-decline {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-decline:hover { background:#b91c1c; color:white; }
+
+.btn-complete {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-complete:hover { background:#1d4ed8; color:white; }
+
+/* ── Service availability ──────────────────────────────────── */
+.service-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.service-row:last-of-type { border-bottom: none; }
+.service-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+.service-name i { color: #22c55e; }
+.badge-active {
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+.btn-edit-avail {
+  width: 100%;
+  margin-top: 16px;
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+  letter-spacing: 0.3px;
+}
+.btn-edit-avail:hover { opacity: 0.88; }
+
+/* ── Earnings chart ────────────────────────────────────────── */
+.earn-chart-wrap {
+  background: linear-gradient(135deg,#eef6ff,#f5f3ff);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.earn-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.earn-row:last-child { border-bottom: none; }
+.earn-label { color: #64748b; }
+.earn-value { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+
+/* ── Empty state ───────────────────────────────────────────── */
+.vd-empty {
+  text-align: center;
+  padding: 36px 0;
+  color: #94a3b8;
+}
+.vd-empty i { font-size: 2.5rem; margin-bottom: 10px; display:block; }
+</style>
+
+
+<div class="vd-wrapper pt-2">
+
+  <!-- ── Top bar ─────────────────────────────────────────── -->
+  <div class="vd-topbar">
+    <h4><i class="fa-solid fa-gauge-high me-2"></i>Vendor Dashboard</h4>
+    <div class="vd-user">
+      <div class="vd-bell">
+        <i class="fa-solid fa-bell"></i>
+        {% if pending_bookings > 0 %}
+        <span class="badge-dot">{{ pending_bookings }}</span>
+        {% endif %}
+      </div>
+      <span>|</span>
+      {% if vendor.profile_image %}
+        <img src="{{ vendor.profile_image.url }}" class="vd-avatar" alt="avatar">
+      {% else %}
+        <div class="vd-avatar-placeholder"><i class="fa-solid fa-user fa-sm"></i></div>
+      {% endif %}
+      <span>{{ vendor.user.get_full_name|default:vendor.user.email }}</span>
+    </div>
+  </div>
+
+  <!-- ── Stat cards ──────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="vd-stat-card bg-stat-blue">
+        <i class="fa-solid fa-calendar-check vd-stat-icon"></i>
+        <span class="vd-stat-label">Total Bookings</span>
+        <span class="vd-stat-value">{{ total_bookings }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="vd-stat-card bg-stat-green">
+        <i class="fa-solid fa-indian-rupee-sign vd-stat-icon"></i>
+        <span class="vd-stat-label">Earnings</span>
+        <span class="vd-stat-value">₹{{ vendor.total_earnings|floatformat:0 }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="vd-stat-card bg-stat-yellow">
+        <i class="fa-solid fa-star vd-stat-icon"></i>
+        <span class="vd-stat-label">Rating</span>
+        <span class="vd-stat-value">{{ vendor.rating|floatformat:1 }} <i class="fa-solid fa-star" style="font-size:1.2rem;opacity:0.85;"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="vd-stat-card bg-stat-purple">
+        <i class="fa-solid fa-briefcase vd-stat-icon"></i>
+        <span class="vd-stat-label">Jobs Completed</span>
+        <span class="vd-stat-value">{{ vendor.total_jobs }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main content ────────────────────────────────────── -->
+  <div class="row g-4">
+
+    <!-- LEFT: Bookings + (future: reviews) -->
+    <div class="col-lg-7">
+
+      <!-- Upcoming Bookings -->
+      <div class="vd-panel mb-4">
+        <div class="vd-panel-title"><i class="fa-solid fa-list-check me-2 text-primary"></i>Upcoming Bookings</div>
+
+        {% if bookings %}
+        <div class="table-responsive">
+          <table class="vd-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Service</th>
+                <th>Date &amp; Time</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for booking in bookings %}
+              <tr>
+                <td class="client-name">{{ booking.user.get_full_name|default:booking.user.email }}</td>
+                <td>{{ booking.service.title }}</td>
+                <td>
+                  <span style="white-space:nowrap;">
+                    {{ booking.booking_date|date:"M j" }}
+                    {% if booking.booking_time %}, {{ booking.booking_time|time:"g:i A" }}{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-status
+                    {% if booking.status == 'pending' %}badge-pending
+                    {% elif booking.status == 'confirmed' %}badge-confirmed
+                    {% elif booking.status == 'completed' %}badge-completed
+                    {% elif booking.status == 'cancelled' %}badge-cancelled
+                    {% endif %}">
+                    {{ booking.status|capfirst }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex gap-1 flex-wrap">
+                    {% if booking.status == 'pending' %}
+                      <a href="{% url 'vendors:accept_booking' booking.id %}" class="btn-accept">Accept</a>
+                      <a href="#" class="btn-decline">Decline</a>
+                    {% elif booking.status == 'confirmed' %}
+                      <a href="{% url 'vendors:complete_booking' booking.id %}" class="btn-complete">Complete</a>
+                    {% else %}
+                      <span class="text-muted" style="font-size:0.8rem;">—</span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="vd-empty">
+          <i class="fa-regular fa-calendar-xmark"></i>
+          <p class="mb-0">No bookings yet. They'll appear here once customers book your service.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Quick Stats row -->
+      <div class="row g-3">
+        <div class="col-4">
+          <div class="vd-panel text-center py-3">
+            <div style="font-size:1.7rem;font-weight:700;color:#2563eb;">{{ total_bookings }}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:500;">Total</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="vd-panel text-center py-3">
+            <div style="font-size:1.7rem;font-weight:700;color:#16a34a;">{{ completed_bookings }}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:500;">Completed</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="vd-panel text-center py-3">
+            <div style="font-size:1.7rem;font-weight:700;color:#d97706;">{{ pending_bookings }}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:500;">Pending</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Services + Earnings -->
+    <div class="col-lg-5 d-flex flex-column gap-4">
+
+      <!-- My Services & Availability -->
+      <div class="vd-panel">
+        <div class="vd-panel-title"><i class="fa-solid fa-screwdriver-wrench me-2 text-success"></i>My Services &amp; Availability</div>
+
+        {% if vendor.service %}
+        <div class="service-row">
+          <span class="service-name">
+            <i class="fa-solid fa-circle-check"></i>
+            {{ vendor.service.title }}
+          </span>
+          <span class="badge-active">
+            {% if vendor.is_available %}Active ✓{% else %}Inactive{% endif %}
+          </span>
+        </div>
+        {% else %}
+        <p class="text-muted" style="font-size:0.88rem;">No service assigned yet.</p>
+        {% endif %}
+
+        <div class="service-row" style="border-bottom:none;padding-top:14px;">
+          <span class="service-name" style="color:#64748b;font-size:0.82rem;">
+            <i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i>
+            Experience: {{ vendor.experience }} yr{% if vendor.experience != 1 %}s{% endif %}
+          </span>
+          <span class="badge-active" style="{% if vendor.is_verified %}background:#dbeafe;color:#1d4ed8;{% else %}background:#fef9c3;color:#854d0e;{% endif %}">
+            {% if vendor.is_verified %}Verified{% else %}Unverified{% endif %}
+          </span>
+        </div>
+
+        <button class="btn-edit-avail mt-3">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Availability
+        </button>
+      </div>
+
+      <!-- Earnings Overview -->
+      <div class="vd-panel">
+        <div class="vd-panel-title"><i class="fa-solid fa-chart-line me-2" style="color:#7c3aed;"></i>Earnings Overview</div>
+
+        <!-- Animated SVG chart -->
+        <div class="earn-chart-wrap">
+          <svg viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="100" x2="320" y2="100" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="0" y1="70"  x2="320" y2="70"  stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="4,4"/>
+            <line x1="0" y1="40"  x2="320" y2="40"  stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="4,4"/>
+            <line x1="0" y1="10"  x2="320" y2="10"  stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="4,4"/>
+            <!-- Area fill -->
+            <path d="M0,90 C40,82 70,74 100,60 C130,46 160,55 200,38 C230,24 265,15 320,8 L320,100 L0,100 Z"
+                  fill="url(#areaGrad)"/>
+            <!-- Line -->
+            <path d="M0,90 C40,82 70,74 100,60 C130,46 160,55 200,38 C230,24 265,15 320,8"
+                  fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+              <animate attributeName="stroke-dasharray"
+                       from="0 600" to="600 0"
+                       dur="1.6s" fill="freeze" />
+            </path>
+            <!-- Dots -->
+            <circle cx="100" cy="60" r="4" fill="#3b82f6" opacity="0.9"/>
+            <circle cx="200" cy="38" r="4" fill="#3b82f6" opacity="0.9"/>
+            <circle cx="320" cy="8"  r="4" fill="#3b82f6" opacity="0.9"/>
+          </svg>
+        </div>
+
+        <div class="earn-row">
+          <span class="earn-label"><i class="fa-solid fa-calendar-day me-1 text-primary"></i>Total Earnings</span>
+          <span class="earn-value">₹{{ vendor.total_earnings|floatformat:0 }}</span>
+        </div>
+        <div class="earn-row">
+          <span class="earn-label"><i class="fa-solid fa-briefcase me-1 text-success"></i>Completed Jobs</span>
+          <span class="earn-value">{{ vendor.total_jobs }}</span>
+        </div>
+        <div class="earn-row">
+          <span class="earn-label"><i class="fa-solid fa-star me-1 text-warning"></i>Rating</span>
+          <span class="earn-value">{{ vendor.rating|floatformat:1 }} / 5.0</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

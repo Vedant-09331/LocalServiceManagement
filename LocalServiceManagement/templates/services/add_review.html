@@ -1,0 +1,34 @@
+<h2>Write Review</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="star-rating">
+    <input type="radio" name="rating" value="5"><label>★</label>
+    <input type="radio" name="rating" value="4"><label>★</label>
+    <input type="radio" name="rating" value="3"><label>★</label>
+    <input type="radio" name="rating" value="2"><label>★</label>
+    <input type="radio" name="rating" value="1"><label>★</label>
+</div>
+
+<textarea name="comment" class="form-control mt-3"></textarea>
+
+<button class="btn btn-primary mt-3">Submit</button>
+</form>
+
+<style>
+.star-rating {
+    direction: rtl;
+    font-size: 30px;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+}
+.star-rating input:checked ~ label {
+    color: gold;
+}
+</style>

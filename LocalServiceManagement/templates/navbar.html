@@ -20,21 +20,21 @@
 
                 <!-- Services -->
                 <li class="nav-item">
-                    <a class="nav-link px-3" href="{% url 'services' %}">
+                    <a class="nav-link px-3" href="{% url 'services:services_list' %}">
                         🛠 Services
                     </a>
                 </li>
 
                 <!-- Dashboard -->
                 <li class="nav-item">
-                    <a class="nav-link px-3" href="{% url 'dashboard' %}">
+                    <a class="nav-link px-3" href="{% url 'core:dashboard' %}">
                         📊 Dashboard
                     </a>
                 </li>
 
                 <!-- Booking History -->
                 <li class="nav-item">
-                    <a class="nav-link text-info" href="{% url 'booking_history' %}">
+                    <a class="nav-link text-info" href="{% url 'bookings:booking_history' %}">
                 My Bookings
                 </a>
                 </li>
@@ -48,7 +48,7 @@
 
                 <!-- Logout -->
                 <li class="nav-item">
-                    <a class="btn btn-warning btn-sm px-3" href="{% url 'logout' %}">
+                    <a class="btn btn-warning btn-sm px-3" href="{% url 'core:logout' %}">
                         Logout
                     </a>
                 </li>
@@ -57,14 +57,14 @@
 
                 <!-- Login -->
                 <li class="nav-item me-2">
-                    <a class="nav-link" href="{% url 'login' %}">
+                    <a class="nav-link" href="{% url 'core:login' %}">
                         Login
                     </a>
                 </li>
 
                 <!-- Signup -->
                 <li class="nav-item">
-                    <a class="btn btn-warning btn-sm px-3" href="{% url 'signup' %}">
+                    <a class="btn btn-warning btn-sm px-3" href="{% url 'core:signup' %}">
                         Sign Up
                     </a>
                 </li>

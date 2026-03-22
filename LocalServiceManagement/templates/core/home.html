@@ -4,29 +4,33 @@
 {% block content %}
 
 <!-- HERO SECTION -->
-<section class="bg-light py-5">
-<div class="container">
+
+<section class="hero">
+
+<div class="hero-overlay"></div>
+
+<div class="container hero-content">
 
 <div class="row align-items-center">
 
 <div class="col-md-6">
 
-<h1 class="fw-bold display-5">
-Home Services at Your Doorstep
+<h1 class="hero-title">
+Premium Home Services <br>
+<span>At Your Doorstep</span>
 </h1>
 
-<p class="text-muted mt-3">
-Book trusted electricians, plumbers, beauticians and cleaners easily.
+<p class="hero-subtitle">
+Book trusted professionals for cleaning, repair, beauty and more in seconds.
 </p>
 
-<form class="mt-4">
+<form method="get" action="{% url 'services:services_list' %}" class="hero-search">
 
 <div class="input-group">
 
-<input type="text" class="form-control form-control-lg"
-placeholder="Search for services...">
+<input type="text" name="q" class="form-control" placeholder="Search for services...">
 
-<button class="btn btn-primary btn-lg">
+<button class="btn hero-btn">
 Search
 </button>
 
@@ -34,28 +38,67 @@ Search
 
 </form>
 
+<a href="{% url 'services:services_list' %}" class="btn btn-outline-light explore-btn">
+Explore Services
+</a>
+
 </div>
 
 <div class="col-md-6 text-center">
 
-<img src="{% static 'images/home-services.png' %}"
-class="img-fluid" style="max-height:350px;">
+<img src="{% static 'images/home-services.png' %}" class="hero-img">
 
 </div>
 
 </div>
 
 </div>
+
 </section>
 
 
-<!-- SERVICE CATEGORIES -->
+<!-- STATS SECTION -->
 
-<section class="py-5">
+<section class="stats">
 
 <div class="container">
 
-<h2 class="text-center mb-5 fw-bold">
+<div class="row text-center">
+
+<div class="col-md-3">
+<h2>500+</h2>
+<p>Professionals</p>
+</div>
+
+<div class="col-md-3">
+<h2>1200+</h2>
+<p>Happy Customers</p>
+</div>
+
+<div class="col-md-3">
+<h2>50+</h2>
+<p>Services</p>
+</div>
+
+<div class="col-md-3">
+<h2>4.8⭐</h2>
+<p>Average Rating</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SERVICES SECTION -->
+
+<section class="services-section">
+
+<div class="container">
+
+<h2 class="section-title">
 Popular Services
 </h2>
 
@@ -65,30 +108,21 @@ Popular Services
 
 <div class="col-md-3">
 
-<div class="card shadow-sm border-0 text-center h-100">
+<div class="service-card">
 
 {% if service.image %}
-<img src="{{ service.image.url }}"
-class="card-img-top"
-style="height:180px; object-fit:cover;">
+<img src="{{ service.image.url }}">
 {% endif %}
 
-<div class="card-body">
+<div class="service-info">
 
-<h5 class="card-title">
-{{ service.name }}
-</h5>
+<h5>{{ service.title }}</h5>
 
-<p class="text-muted small">
-{{ service.description|truncatewords:10 }}
-</p>
+<p>{{ service.description|truncatewords:12 }}</p>
 
-<p class="fw-bold text-primary">
-₹{{ service.price }}
-</p>
+<span class="price">₹{{ service.price }}</span>
 
-<a href="{% url 'service_detail' service.id %}"
-class="btn btn-outline-primary btn-sm">
+<a href="{% url 'services:service_detail' service.id %}" class="btn view-btn">
 View Service
 </a>
 
@@ -96,6 +130,12 @@ View Service
 
 </div>
 
+</div>
+
+{% empty %}
+
+<div class="col-12 text-center">
+<h4>No services available</h4>
 </div>
 
 {% endfor %}
@@ -107,13 +147,13 @@ View Service
 </section>
 
 
-<!-- WHY CHOOSE US -->
+<!-- FEATURES -->
 
-<section class="bg-light py-5">
+<section class="features">
 
 <div class="container">
 
-<h2 class="text-center fw-bold mb-5">
+<h2 class="section-title">
 Why Choose Us
 </h2>
 
@@ -121,15 +161,13 @@ Why Choose Us
 
 <div class="col-md-4">
 
-<div class="p-4">
+<div class="feature-card">
 
-<i class="fa-solid fa-user-check fa-3x text-primary mb-3"></i>
+<i class="fa-solid fa-user-check"></i>
 
 <h5>Verified Professionals</h5>
 
-<p class="text-muted">
-All service providers are background checked and trained.
-</p>
+<p>All professionals are background checked and trained.</p>
 
 </div>
 
@@ -137,15 +175,13 @@ All service providers are background checked and trained.
 
 <div class="col-md-4">
 
-<div class="p-4">
+<div class="feature-card">
 
-<i class="fa-solid fa-clock fa-3x text-primary mb-3"></i>
+<i class="fa-solid fa-clock"></i>
 
-<h5>On-Time Service</h5>
+<h5>On Time Service</h5>
 
-<p class="text-muted">
-Book services instantly and get professionals at your doorstep.
-</p>
+<p>Fast booking and quick arrival at your home.</p>
 
 </div>
 
@@ -153,15 +189,13 @@ Book services instantly and get professionals at your doorstep.
 
 <div class="col-md-4">
 
-<div class="p-4">
+<div class="feature-card">
 
-<i class="fa-solid fa-star fa-3x text-primary mb-3"></i>
+<i class="fa-solid fa-star"></i>
 
-<h5>Top Rated Services</h5>
+<h5>Top Rated</h5>
 
-<p class="text-muted">
-Thousands of satisfied customers with excellent ratings.
-</p>
+<p>Thousands of satisfied customers with great reviews.</p>
 
 </div>
 
@@ -174,21 +208,17 @@ Thousands of satisfied customers with excellent ratings.
 </section>
 
 
-<!-- CALL TO ACTION -->
+<!-- CTA -->
 
-<section class="py-5 text-center">
+<section class="cta">
 
-<div class="container">
+<div class="container text-center">
 
-<h2 class="fw-bold">
-Need a service today?
-</h2>
+<h2>Need a service today?</h2>
 
-<p class="text-muted">
-Book a professional in just a few clicks.
-</p>
+<p>Book trusted professionals in seconds.</p>
 
-<a href="{% url 'services_list' %}" class="btn btn-primary btn-lg mt-3">
+<a href="{% url 'services:services_list' %}" class="btn cta-btn">
 Browse Services
 </a>
 
@@ -196,5 +226,199 @@ Browse Services
 
 </section>
 
+
+<style>
+
+/* HERO */
+
+.hero{
+position:relative;
+background: linear-gradient(135deg,#4e73df,#1cc88a,#36b9cc);
+padding:120px 0;
+color:white;
+overflow:hidden;
+}
+
+.hero-overlay{
+position:absolute;
+width:500px;
+height:500px;
+background:rgba(255,255,255,0.1);
+filter:blur(100px);
+border-radius:50%;
+top:-150px;
+right:-150px;
+}
+
+.hero-title{
+font-size:55px;
+font-weight:700;
+}
+
+.hero-title span{
+color:#ffe082;
+}
+
+.hero-subtitle{
+font-size:18px;
+margin-top:15px;
+opacity:0.9;
+}
+
+.hero-search{
+margin-top:30px;
+}
+
+.hero-search input{
+height:55px;
+border-radius:10px 0 0 10px;
+}
+
+.hero-btn{
+background:white;
+color:#4e73df;
+font-weight:600;
+border-radius:0 10px 10px 0;
+}
+
+.hero-btn:hover{
+background:#f8f9fa;
+}
+
+.explore-btn{
+margin-top:15px;
+border-radius:30px;
+}
+
+.hero-img{
+max-width:100%;
+animation: float 5s ease-in-out infinite;
+}
+
+
+/* FLOAT ANIMATION */
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-20px)}
+100%{transform:translateY(0)}
+}
+
+
+/* STATS */
+
+.stats{
+background:#f8f9fc;
+padding:60px 0;
+}
+
+.stats h2{
+font-size:40px;
+font-weight:700;
+color:#4e73df;
+}
+
+
+/* SERVICES */
+
+.services-section{
+padding:80px 0;
+}
+
+.section-title{
+text-align:center;
+font-weight:700;
+margin-bottom:50px;
+}
+
+.service-card{
+background:white;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+transition:0.4s;
+}
+
+.service-card:hover{
+transform:translateY(-10px);
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+.service-card img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+.service-info{
+padding:20px;
+text-align:center;
+}
+
+.price{
+display:block;
+font-weight:700;
+color:#4e73df;
+margin:10px 0;
+}
+
+.view-btn{
+border:1px solid #4e73df;
+color:#4e73df;
+border-radius:25px;
+}
+
+.view-btn:hover{
+background:#4e73df;
+color:white;
+}
+
+
+/* FEATURES */
+
+.features{
+background:#f8f9fc;
+padding:80px 0;
+}
+
+.feature-card{
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+.feature-card:hover{
+transform:translateY(-8px);
+}
+
+.feature-card i{
+font-size:40px;
+color:#4e73df;
+margin-bottom:15px;
+}
+
+
+/* CTA */
+
+.cta{
+background: linear-gradient(135deg,#1cc88a,#4e73df);
+padding:80px 0;
+color:white;
+}
+
+.cta-btn{
+background:white;
+color:#4e73df;
+border-radius:30px;
+font-weight:600;
+}
+
+.cta-btn:hover{
+background:#f8f9fa;
+}
+
+</style>
 
 {% endblock %}

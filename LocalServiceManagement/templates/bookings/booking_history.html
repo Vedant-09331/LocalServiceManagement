@@ -44,7 +44,10 @@
 {% endif %}
 </td>
 <td>
-<a href="{% url 'service_detail' booking.service.id %}" class="btn btn-sm btn-outline-primary">View</a>
+    {% if booking.payment_status == 'unpaid' %}
+        <a href="{% url 'payments:checkout' booking.id %}" class="btn btn-sm btn-success">Pay Now</a>
+    {% endif %}
+    <a href="{% url 'services:service_detail' booking.service.id %}" class="btn btn-sm btn-outline-primary">View</a>
 </td>
 </tr>
 
