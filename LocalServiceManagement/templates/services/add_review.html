@@ -1,34 +1,143 @@
-<h2>Write Review</h2>
+{% extends "base.html" %}
 
-<form method="POST">
-{% csrf_token %}
+{% block title %}Write a Review – {{ service.name }}{% endblock %}
 
-<div class="star-rating">
-    <input type="radio" name="rating" value="5"><label>★</label>
-    <input type="radio" name="rating" value="4"><label>★</label>
-    <input type="radio" name="rating" value="3"><label>★</label>
-    <input type="radio" name="rating" value="2"><label>★</label>
-    <input type="radio" name="rating" value="1"><label>★</label>
-</div>
-
-<textarea name="comment" class="form-control mt-3"></textarea>
-
-<button class="btn btn-primary mt-3">Submit</button>
-</form>
+{% block content %}
 
 <style>
-.star-rating {
-    direction: rtl;
-    font-size: 30px;
+.review-wrapper { max-width: 680px; margin: 0 auto; }
+.review-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
+    padding: 42px 48px;
+    animation: fadeUp 0.5s ease;
 }
-.star-rating input {
-    display: none;
+.service-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+    border: 1px solid #bfdbfe;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d4ed8;
+    margin-bottom: 28px;
 }
-.star-rating label {
-    color: #ccc;
-    cursor: pointer;
+.section-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 12px;
 }
-.star-rating input:checked ~ label {
-    color: gold;
+.star-row { display: flex; gap: 8px; margin-bottom: 32px; }
+.star-btn {
+    background: none; border: none; padding: 0;
+    cursor: pointer; font-size: 40px;
+    color: #d1d5db; transition: color 0.15s, transform 0.15s; line-height: 1;
 }
+.star-btn:hover, .star-btn.active { color: #f59e0b; transform: scale(1.15); }
+.star-hint { font-size: 13px; color: #9ca3af; margin-top: 6px; min-height: 18px; }
+.review-textarea {
+    width: 100%; border: 2px solid #e5e7eb; border-radius: 14px;
+    padding: 16px; font-size: 15px; font-family: 'Poppins', sans-serif;
+    resize: vertical; min-height: 140px; transition: border-color 0.2s;
+    outline: none; color: #1f2937;
+}
+.review-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+.char-counter { font-size: 12px; color: #9ca3af; text-align: right; margin-top: 6px; }
+.btn-submit-review {
+    width: 100%; padding: 14px; font-size: 16px; font-weight: 600;
+    border-radius: 50px; border: none;
+    background: linear-gradient(45deg, #2563eb, #06b6d4);
+    color: white; transition: opacity 0.2s, transform 0.2s; margin-top: 10px;
+}
+.btn-submit-review:hover { opacity: 0.9; transform: translateY(-2px); }
+.btn-submit-review:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
+.cancel-link {
+    display: block; text-align: center; margin-top: 14px;
+    font-size: 14px; color: #9ca3af; text-decoration: none; transition: color 0.2s;
+}
+.cancel-link:hover { color: #ef4444; }
 </style>
+
+<div class="review-wrapper py-4">
+    <h2 class="fw-bold mb-1">Share Your Experience</h2>
+    <p class="text-muted mb-4">Your honest feedback helps others make better choices.</p>
+
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <div class="review-card">
+        <div class="service-badge">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            {{ service.name }}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="rating" id="rating-value" value="">
+
+            <p class="section-label">Your Rating <span class="text-danger">*</span></p>
+            <div class="star-row" id="star-row">
+                {% for i in "12345" %}
+                <button type="button" class="star-btn" data-value="{{ forloop.counter }}">&#9733;</button>
+                {% endfor %}
+            </div>
+            <p class="star-hint" id="star-hint">Click a star to rate</p>
+
+            <p class="section-label mt-4">Your Review <span class="text-muted fw-normal">(optional)</span></p>
+            <textarea name="comment" id="review-comment" class="review-textarea"
+                placeholder="Tell us what you liked or what could be improved…"
+                maxlength="1000"></textarea>
+            <div class="char-counter"><span id="char-count">0</span> / 1000</div>
+
+            <button type="submit" class="btn-submit-review" id="submit-btn" disabled>
+                <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+            </button>
+        </form>
+
+        <a href="{% url 'services:service_detail' service.id %}" class="cancel-link">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back to Service
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const stars = document.querySelectorAll('.star-btn');
+    const ratingInp = document.getElementById('rating-value');
+    const hint = document.getElementById('star-hint');
+    const submitBtn = document.getElementById('submit-btn');
+    const textarea = document.getElementById('review-comment');
+    const counter = document.getElementById('char-count');
+    let current = 0;
+    const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent!'];
+
+    function setStars(n) {
+        stars.forEach((s, i) => s.classList.toggle('active', i < n));
+        hint.textContent = n ? labels[n] : 'Click a star to rate';
+        ratingInp.value = n || '';
+        submitBtn.disabled = (n === 0);
+    }
+
+    stars.forEach((btn, idx) => {
+        btn.addEventListener('mouseenter', () => setStars(idx + 1));
+        btn.addEventListener('mouseleave', () => setStars(current));
+        btn.addEventListener('click', () => { current = idx + 1; setStars(current); });
+    });
+
+    textarea.addEventListener('input', () => { counter.textContent = textarea.value.length; });
+})();
+</script>
+{% endblock %}

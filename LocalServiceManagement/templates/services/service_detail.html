@@ -30,16 +30,19 @@
 </h3>
 
 <!-- Rating -->
-<p class="text-warning fs-5 mb-2">
-{% for i in "12345" %}
-    {% if forloop.counter <= service.average_rating %}
-        ⭐
-    {% else %}
-        ☆
-    {% endif %}
-{% endfor %}
-<span class="text-muted fs-6">({{ reviews|length }} reviews)</span>
-</p>
+<div class="d-flex align-items-center gap-2 mb-2">
+    <span class="fs-4 fw-bold text-warning">{{ service.rating|floatformat:1 }}</span>
+    <span class="text-warning fs-5">
+        {% for i in "12345" %}
+            {% if forloop.counter <= service.rating %}
+                ★
+            {% else %}
+                ☆
+            {% endif %}
+        {% endfor %}
+    </span>
+    <span class="text-muted fs-6">({{ service.rating_count }} review{{ service.rating_count|pluralize }})</span>
+</div>
 
 <!-- ACTION BUTTONS -->
 <div class="mt-4 d-flex gap-3">
@@ -93,9 +96,14 @@ class="btn btn-lg {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% e
 <!-- CUSTOMER REVIEWS -->
 <div class="mt-5">
 
-<h3 class="fw-bold mb-4">
-Customer Reviews
-</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">Customer Reviews</h3>
+    {% if user.is_authenticated %}
+    <a href="{% url 'services:add_review' service.id %}" class="btn btn-outline-primary btn-sm">
+        <i class="fa-solid fa-pen me-1"></i> Write a Review
+    </a>
+    {% endif %}
+</div>
 
 {% for review in reviews %}
 
@@ -103,26 +111,22 @@ Customer Reviews
 
 <div class="card-body">
 
-<div class="d-flex justify-content-between">
-<strong>{{ review.user.username }}</strong>
-<span class="text-warning">
-{% for i in "12345" %}
-    {% if forloop.counter <= review.rating %}
-        ⭐
-    {% else %}
-        ☆
-    {% endif %}
-{% endfor %}
-</span>
+<div class="d-flex justify-content-between align-items-start">
+    <div>
+        <strong>{{ review.user.username }}</strong>
+        <small class="text-muted ms-2">{{ review.created_at|date:"M d, Y" }}</small>
+    </div>
+    <span class="text-warning fs-6">
+        {% for i in "12345" %}
+            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+        {% endfor %}
+        <span class="text-muted ms-1 small">{{ review.rating }}/5</span>
+    </span>
 </div>
 
-<p class="text-muted mt-2 mb-1">
+<p class="text-muted mt-2 mb-0">
 {{ review.comment }}
 </p>
-
-<small class="text-muted">
-Posted on {{ review.created_at|date:"M d, Y" }}
-</small>
 
 </div>
 
@@ -130,9 +134,12 @@ Posted on {{ review.created_at|date:"M d, Y" }}
 
 {% empty %}
 
-<div class="text-center text-muted">
+<div class="text-center text-muted py-4">
 <h5>No reviews yet 😕</h5>
 <p>Be the first to review this service!</p>
+{% if user.is_authenticated %}
+<a href="{% url 'services:add_review' service.id %}" class="btn btn-primary mt-2">Write a Review</a>
+{% endif %}
 </div>
 
 {% endfor %}

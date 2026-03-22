@@ -12,6 +12,29 @@
   padding-bottom: 60px;
 }
 
+/* ── Portal Nav ───────────────────────────────────────────────── */
+.vd-portal-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.vd-portal-nav a {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: white;
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: 0.2s;
+}
+.vd-portal-nav a:hover, .vd-portal-nav a.active {
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color: white;
+}
+
 /* ── Top bar ───────────────────────────────────────────────── */
 .vd-topbar {
   background: linear-gradient(135deg, #2d3a5f, #3b4f83);
@@ -21,7 +44,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   box-shadow: 0 8px 30px rgba(45,58,95,0.35);
 }
 .vd-topbar h4 {
@@ -130,6 +153,8 @@
 .bg-stat-green  { background: linear-gradient(135deg,#16a34a,#22c55e); }
 .bg-stat-yellow { background: linear-gradient(135deg,#d97706,#f59e0b); }
 .bg-stat-purple { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+.bg-stat-rose   { background: linear-gradient(135deg,#db2777,#f472b6); }
+.bg-stat-cyan   { background: linear-gradient(135deg,#0891b2,#22d3ee); }
 
 /* ── Panel card ────────────────────────────────────────────── */
 .vd-panel {
@@ -280,8 +305,11 @@
   cursor: pointer;
   transition: 0.25s;
   letter-spacing: 0.3px;
+  text-decoration: none;
+  display: block;
+  text-align: center;
 }
-.btn-edit-avail:hover { opacity: 0.88; }
+.btn-edit-avail:hover { opacity: 0.88; color: white; }
 
 /* ── Earnings chart ────────────────────────────────────────── */
 .earn-chart-wrap {
@@ -301,6 +329,16 @@
 .earn-label { color: #64748b; }
 .earn-value { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
 
+/* ── Recent Reviews ────────────────────────────────────────── */
+.mini-review {
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.mini-review:last-child { border-bottom: none; }
+.mini-stars { color: #f59e0b; font-size: 0.8rem; }
+.mini-reviewer { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
+.mini-comment { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
 /* ── Empty state ───────────────────────────────────────────── */
 .vd-empty {
   text-align: center;
@@ -312,6 +350,24 @@
 
 
 <div class="vd-wrapper pt-2">
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- ── Portal Navigation ─────────────────────────────────── -->
+  <div class="vd-portal-nav">
+    <a href="{% url 'vendors:vendor_dashboard' %}" class="active"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
+    <a href="{% url 'vendors:vendor_profile' %}"><i class="fa-solid fa-user-pen me-1"></i>Profile</a>
+    <a href="{% url 'vendors:vendor_my_services' %}"><i class="fa-solid fa-screwdriver-wrench me-1"></i>My Services</a>
+    <a href="{% url 'vendors:vendor_bookings' %}"><i class="fa-solid fa-calendar-check me-1"></i>Bookings</a>
+    <a href="{% url 'vendors:vendor_earnings' %}"><i class="fa-solid fa-chart-line me-1"></i>Earnings</a>
+    <a href="{% url 'vendors:vendor_reviews' %}"><i class="fa-solid fa-star me-1"></i>Reviews</a>
+  </div>
 
   <!-- ── Top bar ─────────────────────────────────────────── -->
   <div class="vd-topbar">
@@ -335,32 +391,46 @@
 
   <!-- ── Stat cards ──────────────────────────────────────── -->
   <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg-2">
       <div class="vd-stat-card bg-stat-blue">
         <i class="fa-solid fa-calendar-check vd-stat-icon"></i>
-        <span class="vd-stat-label">Total Bookings</span>
+        <span class="vd-stat-label">Total</span>
         <span class="vd-stat-value">{{ total_bookings }}</span>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg-2">
       <div class="vd-stat-card bg-stat-green">
         <i class="fa-solid fa-indian-rupee-sign vd-stat-icon"></i>
-        <span class="vd-stat-label">Earnings</span>
-        <span class="vd-stat-value">₹{{ vendor.total_earnings|floatformat:0 }}</span>
+        <span class="vd-stat-label">Earned</span>
+        <span class="vd-stat-value" style="font-size:1.5rem;">₹{{ total_earnings_computed|floatformat:0 }}</span>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg-2">
       <div class="vd-stat-card bg-stat-yellow">
         <i class="fa-solid fa-star vd-stat-icon"></i>
         <span class="vd-stat-label">Rating</span>
-        <span class="vd-stat-value">{{ vendor.rating|floatformat:1 }} <i class="fa-solid fa-star" style="font-size:1.2rem;opacity:0.85;"></i></span>
+        <span class="vd-stat-value">{{ vendor.rating|floatformat:1 }}</span>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg-2">
       <div class="vd-stat-card bg-stat-purple">
         <i class="fa-solid fa-briefcase vd-stat-icon"></i>
-        <span class="vd-stat-label">Jobs Completed</span>
+        <span class="vd-stat-label">Jobs Done</span>
         <span class="vd-stat-value">{{ vendor.total_jobs }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="vd-stat-card bg-stat-rose">
+        <i class="fa-solid fa-clock vd-stat-icon"></i>
+        <span class="vd-stat-label">Pending</span>
+        <span class="vd-stat-value">{{ pending_bookings }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="vd-stat-card bg-stat-cyan">
+        <i class="fa-solid fa-comment-dots vd-stat-icon"></i>
+        <span class="vd-stat-label">Reviews</span>
+        <span class="vd-stat-value">{{ reviews_count }}</span>
       </div>
     </div>
   </div>
@@ -412,7 +482,8 @@
                   <div class="d-flex gap-1 flex-wrap">
                     {% if booking.status == 'pending' %}
                       <a href="{% url 'vendors:accept_booking' booking.id %}" class="btn-accept">Accept</a>
-                      <a href="#" class="btn-decline">Decline</a>
+                      <a href="{% url 'vendors:reject_booking' booking.id %}" class="btn-decline"
+                         onclick="return confirm('Decline this booking?')">Decline</a>
                     {% elif booking.status == 'confirmed' %}
                       <a href="{% url 'vendors:complete_booking' booking.id %}" class="btn-complete">Complete</a>
                     {% else %}
@@ -474,9 +545,16 @@
             {% if vendor.is_available %}Active ✓{% else %}Inactive{% endif %}
           </span>
         </div>
-        {% else %}
-        <p class="text-muted" style="font-size:0.88rem;">No service assigned yet.</p>
         {% endif %}
+
+        {% for svc in my_services|slice:":3" %}
+        <div class="service-row">
+          <span class="service-name">
+            <i class="fa-solid fa-check"></i>{{ svc.title|default:svc.name }}
+          </span>
+          <span class="badge-active" style="background:#dbeafe;color:#1d4ed8;">₹{{ svc.price }}</span>
+        </div>
+        {% endfor %}
 
         <div class="service-row" style="border-bottom:none;padding-top:14px;">
           <span class="service-name" style="color:#64748b;font-size:0.82rem;">
@@ -488,9 +566,9 @@
           </span>
         </div>
 
-        <button class="btn-edit-avail mt-3">
-          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Availability
-        </button>
+        <a href="{% url 'vendors:vendor_profile' %}" class="btn-edit-avail mt-3">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Profile & Availability
+        </a>
       </div>
 
       <!-- Earnings Overview -->
@@ -530,7 +608,7 @@
 
         <div class="earn-row">
           <span class="earn-label"><i class="fa-solid fa-calendar-day me-1 text-primary"></i>Total Earnings</span>
-          <span class="earn-value">₹{{ vendor.total_earnings|floatformat:0 }}</span>
+          <span class="earn-value">₹{{ total_earnings_computed|floatformat:0 }}</span>
         </div>
         <div class="earn-row">
           <span class="earn-label"><i class="fa-solid fa-briefcase me-1 text-success"></i>Completed Jobs</span>
@@ -540,6 +618,40 @@
           <span class="earn-label"><i class="fa-solid fa-star me-1 text-warning"></i>Rating</span>
           <span class="earn-value">{{ vendor.rating|floatformat:1 }} / 5.0</span>
         </div>
+        <div class="earn-row">
+          <span class="earn-label"><i class="fa-solid fa-comment-dots me-1" style="color:#7c3aed;"></i>Reviews</span>
+          <span class="earn-value">{{ reviews_count }}</span>
+        </div>
+        <a href="{% url 'vendors:vendor_earnings' %}" style="font-size:0.82rem;color:#3b82f6;text-decoration:none;font-weight:600;display:block;margin-top:10px;">
+          <i class="fa-solid fa-arrow-right me-1"></i>View full earnings report
+        </a>
+      </div>
+
+      <!-- Recent Reviews -->
+      <div class="vd-panel">
+        <div class="vd-panel-title"><i class="fa-solid fa-star me-2 text-warning"></i>Recent Reviews</div>
+        {% if recent_reviews %}
+          {% for review in recent_reviews %}
+          <div class="mini-review">
+            <div class="d-flex justify-content-between align-items-start">
+              <span class="mini-reviewer">{{ review.user.get_full_name|default:review.user.email }}</span>
+              <span class="mini-stars">
+                {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fa-solid fa-star" style="font-size:0.75rem;"></i>{% endif %}{% endfor %}
+              </span>
+            </div>
+            <div style="font-size:0.75rem;color:#94a3b8;">{{ review.service.title|default:review.service.name }}</div>
+            <div class="mini-comment">{{ review.comment|truncatechars:80 }}</div>
+          </div>
+          {% endfor %}
+          <a href="{% url 'vendors:vendor_reviews' %}" style="font-size:0.82rem;color:#3b82f6;text-decoration:none;font-weight:600;display:block;margin-top:10px;">
+            <i class="fa-solid fa-arrow-right me-1"></i>View all {{ reviews_count }} reviews
+          </a>
+        {% else %}
+        <div class="vd-empty" style="padding:20px 0;">
+          <i class="fa-regular fa-star" style="font-size:1.8rem;"></i>
+          <p class="mb-0" style="font-size:0.85rem;">No reviews yet.</p>
+        </div>
+        {% endif %}
       </div>
 
     </div>

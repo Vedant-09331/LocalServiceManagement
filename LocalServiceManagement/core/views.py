@@ -208,3 +208,22 @@ def updateBookingStatus(request, booking_id):
 def userlogoutView(request):
     logout(request)
     return redirect('core:login')
+
+
+# ---------------- VENDOR PROFILE ---------------- #
+def vendor_profile(request):
+    if request.user.role != 'vendor':
+        return redirect('core:login')
+
+    user = request.user
+
+    if request.method == 'POST':
+        user.bio = request.POST.get('bio')
+        
+        if request.FILES.get('profile_image'):
+            user.profile_image = request.FILES.get('profile_image')
+
+        user.save()
+        messages.success(request, "Profile updated successfully")
+
+    return render(request, 'core/vendor_profile.html')

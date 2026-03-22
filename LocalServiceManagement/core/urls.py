@@ -12,6 +12,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('user-dashboard/', views.userDashboard, name='user_dashboard'),
     path('admin-dashboard/', views.adminDashboard, name='admin_dashboard'),
-
+    path('vendor/profile/',views.vendor_profile, name='vendor_profile'),
     path('update-booking/<int:booking_id>/<str:status>/', views.updateBookingStatus, name='update_booking_status'),
 ]

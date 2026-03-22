@@ -10,4 +10,5 @@ urlpatterns = [
     path('history/', views.booking_history, name='booking_history'),
     path('', views.bookings_home, name='bookings_home'),
     path("my-bookings/", views.my_bookings, name="my_bookings"),
+    path('review/<int:booking_id>/', views.write_review, name='write_review'),
 ]

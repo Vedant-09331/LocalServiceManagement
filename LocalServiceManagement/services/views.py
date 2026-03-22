@@ -12,7 +12,7 @@ from professionals.models import Professional
 def add_service(request):
     """
     Allow vendors to create and add new services.
-    
+
     POST: Creates a new service with files
     GET: Returns form for service creation
     """
@@ -23,7 +23,7 @@ def add_service(request):
             service.vendor = request.user
             service.title = service.name  # Set title based on name
             service.save()
-            return redirect('vendor_dashboard')
+            return redirect('vendors:vendor_dashboard')
     else:
         form = ServiceForm()
 
@@ -35,7 +35,7 @@ def add_service(request):
 def vendor_services(request):
     """Display services created by the current vendor."""
     services = Service.objects.filter(vendor=request.user)
-    return render(request, 'vendor_services.html', {'services': services})
+    return render(request, 'services/vendor_services.html', {'services': services})
 
 
 def services_list(request):
@@ -107,29 +107,29 @@ def calculate_service_rating(service):
 
 @login_required
 def edit_service(request, service_id):
-    service = Service.objects.get(id=service_id, vendor=request.user.vendor)
+    service = get_object_or_404(Service, id=service_id, vendor=request.user)
     if request.method == "POST":
         form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
             form.save()
-            return redirect('vendor_services')
+            return redirect('vendors:vendor_my_services')
     else:
         form = ServiceForm(instance=service)
-    return render(request, 'services/edit_service.html', {'form': form})
+    return render(request, 'services/edit_service.html', {'form': form, 'service': service})
 
 @login_required
 def delete_service(request, service_id):
-    service = Service.objects.get(id=service_id, vendor=request.user.vendor)
+    service = get_object_or_404(Service, id=service_id, vendor=request.user)
     service.delete()
-    return redirect('vendor_services')
+    return redirect('vendors:vendor_my_services')
 
 @login_required
 def add_review(request, service_id):
-    service = Service.objects.get(id=service_id)
+    service = get_object_or_404(Service, id=service_id)
 
     if request.method == "POST":
         rating = request.POST.get('rating')
-        comment = request.POST.get('comment')
+        comment = request.POST.get('comment', '').strip()
 
         Review.objects.create(
             service=service,
@@ -138,7 +138,13 @@ def add_review(request, service_id):
             comment=comment
         )
 
-        return redirect('service_detail', service_id=service.id)
+        # Recalculate service average rating
+        aggregated = Review.objects.filter(service=service).aggregate(average=Avg('rating'))
+        service.rating = round(aggregated['average'] or 0, 1)
+        service.rating_count = Review.objects.filter(service=service).count()
+        service.save()
+
+        return redirect('services:service_detail', service_id=service.id)
 
     return render(request, 'services/add_review.html', {'service': service}) 
 

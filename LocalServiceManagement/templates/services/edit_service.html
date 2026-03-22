@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Edit Service | Vendor Portal{% endblock %}
+
+{% block content %}
+<style>
+.es-wrap { font-family:'Poppins',sans-serif; max-width:760px; margin:0 auto; }
+.es-card {
+  background:white; border-radius:20px;
+  box-shadow:0 6px 28px rgba(0,0,0,0.09); padding:36px;
+}
+.es-title {
+  font-size:1.3rem; font-weight:700; color:#1e2a4a;
+  margin-bottom:24px; padding-bottom:14px;
+  border-bottom:2px solid #f1f5f9;
+}
+.form-label { font-weight:600; font-size:0.88rem; color:#374151; }
+.form-control, .form-select {
+  border-radius:10px; border:1.5px solid #e2e8f0;
+  font-size:0.9rem; padding:10px 14px;
+}
+.form-control:focus, .form-select:focus {
+  border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12);
+}
+.current-img {
+  width:80px; height:80px; border-radius:12px;
+  object-fit:cover; border:2px solid #e2e8f0;
+}
+.btn-update {
+  background:linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color:white; border:none; border-radius:12px;
+  padding:11px 32px; font-weight:600; font-size:0.95rem;
+  cursor:pointer; transition:0.25s;
+}
+.btn-update:hover { opacity:0.88; }
+.btn-cancel {
+  background:#f1f5f9; color:#475569; border:none;
+  border-radius:12px; padding:11px 24px;
+  font-weight:600; font-size:0.95rem; text-decoration:none;
+  transition:0.2s;
+}
+.btn-cancel:hover { background:#e2e8f0; color:#1e293b; }
+</style>
+
+<div class="es-wrap">
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="es-card">
+    <div class="es-title"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i>Edit Service</div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label">Service Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Category</label>
+          {{ form.category }}
+          {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Price (₹)</label>
+          {{ form.price }}
+          {% if form.price.errors %}<div class="text-danger small mt-1">{{ form.price.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          {{ form.description }}
+          {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Service Image</label>
+          {% if service.image %}
+            <div class="mb-2 d-flex align-items-center gap-2">
+              <img src="{{ service.image.url }}" class="current-img" alt="Current image">
+              <small class="text-muted">Current image — upload a new one to replace it</small>
+            </div>
+          {% endif %}
+          {{ form.image }}
+        </div>
+
+        <div class="col-12 d-flex gap-3 mt-2">
+          <button type="submit" class="btn-update">
+            <i class="fa-solid fa-floppy-disk me-2"></i>Update Service
+          </button>
+          <a href="{% url 'vendors:vendor_my_services' %}" class="btn-cancel">Cancel</a>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
