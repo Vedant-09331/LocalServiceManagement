@@ -67,7 +67,7 @@ def services_list(request):
     page = request.GET.get('page')
     services = paginator.get_page(page)
 
-    return render(request, 'services/services.html', {
+    return render(request, 'services/services_list.html', {
         'services': services,
         'query': query,
         'category_id': category_id,

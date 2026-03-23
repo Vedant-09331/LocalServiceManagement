@@ -6,9 +6,7 @@ from django.db.models import Avg
 from .models import Booking
 from services.models import Service, Review
 from professionals.models import Professional
-from vendors.models import Vendor
-
-
+from vendors.models import Vendor 
 # Book a service
 @login_required
 def book_service(request, id):
@@ -16,15 +14,15 @@ def book_service(request, id):
     service = get_object_or_404(Service, id=id)
     reviews = Review.objects.filter(service=service)
 
-    # Get professional linked to service
     professional = Professional.objects.filter(service=service).first()
 
-    # ✅ FIX: Get vendor correctly
+    # ✅ FIXED vendor fetch
     vendor = Vendor.objects.filter(service=service).first()
 
+    # Safety check
     if not vendor:
         messages.error(request, "No vendor available for this service.")
-        return redirect("services:service_list")
+        return redirect("services:services_list")
 
     if request.method == "POST":
         booking_date = request.POST.get("booking_date")
@@ -39,12 +37,12 @@ def book_service(request, id):
                 'reviews': reviews,
             })
 
-        # ✅ Create booking properly
+        # ✅ CREATE BOOKING (CORRECT)
         booking = Booking.objects.create(
             user=request.user,
             service=service,
             professional=professional,
-            vendor=vendor,   # ✅ CORRECT (Vendor instance)
+            vendor=vendor,   # ✅ MUST be Vendor instance
             booking_date=booking_date,
             booking_time=booking_time if booking_time else None,
             address=address,
@@ -59,7 +57,6 @@ def book_service(request, id):
         'professional': professional,
         'reviews': reviews,
     })
-
 
 # User booking history
 @login_required
@@ -81,12 +78,12 @@ def confirm_booking(request, service_id, professional_id):
 
     reviews = Review.objects.filter(service=service)
 
-    # ✅ FIX: Get vendor correctly
-    vendor = Vendor.objects.filter(service=service).first()
+    # ✅ FIXED
+    vendor = service.vendor
 
     if not vendor:
         messages.error(request, "No vendor available for this service.")
-        return redirect("services:service_list")
+        return redirect("services:services_list")  # ✅ FIXED
 
     if request.method == "POST":
         booking_date = request.POST.get("booking_date")
@@ -96,7 +93,7 @@ def confirm_booking(request, service_id, professional_id):
             user=request.user,
             service=service,
             professional=professional,
-            vendor=vendor,   # ✅ FIXED
+            vendor=vendor,
             booking_date=booking_date,
             address=address
         )
