@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg
+
 from .models import Booking
 from services.models import Service, Review
 from professionals.models import Professional
@@ -15,8 +16,15 @@ def book_service(request, id):
     service = get_object_or_404(Service, id=id)
     reviews = Review.objects.filter(service=service)
 
-    # Pre-fetch the professional so we can show it on the page
+    # Get professional linked to service
     professional = Professional.objects.filter(service=service).first()
+
+    # ✅ FIX: Get vendor correctly
+    vendor = Vendor.objects.filter(service=service).first()
+
+    if not vendor:
+        messages.error(request, "No vendor available for this service.")
+        return redirect("services:service_list")
 
     if request.method == "POST":
         booking_date = request.POST.get("booking_date")
@@ -31,15 +39,12 @@ def book_service(request, id):
                 'reviews': reviews,
             })
 
-
-        # Resolve the vendor who offers this service
-        vendor = Vendor.objects.filter(service=service).first()
-        vendor=service.vendor
+        # ✅ Create booking properly
         booking = Booking.objects.create(
             user=request.user,
             service=service,
             professional=professional,
-            vendor=vendor,
+            vendor=vendor,   # ✅ CORRECT (Vendor instance)
             booking_date=booking_date,
             booking_time=booking_time if booking_time else None,
             address=address,
@@ -59,36 +64,39 @@ def book_service(request, id):
 # User booking history
 @login_required
 def booking_history(request):
-
     bookings = Booking.objects.filter(user=request.user)
-
     return render(request, 'bookings/booking_history.html', {'bookings': bookings})
 
 
 def bookings_home(request):
     return render(request, 'bookings/bookings_home.html')
 
+
+# Confirm booking
 @login_required
 def confirm_booking(request, service_id, professional_id):
 
     service = get_object_or_404(Service, id=service_id)
     professional = get_object_or_404(Professional, id=professional_id)
 
-    # Fetch reviews related to the service
     reviews = Review.objects.filter(service=service)
 
-    if request.method == "POST":
+    # ✅ FIX: Get vendor correctly
+    vendor = Vendor.objects.filter(service=service).first()
 
+    if not vendor:
+        messages.error(request, "No vendor available for this service.")
+        return redirect("services:service_list")
+
+    if request.method == "POST":
         booking_date = request.POST.get("booking_date")
         address = request.POST.get("address")
-
-        vendor = Vendor.objects.filter(service=service).first()
 
         booking = Booking.objects.create(
             user=request.user,
             service=service,
             professional=professional,
-            vendor=vendor,
+            vendor=vendor,   # ✅ FIXED
             booking_date=booking_date,
             address=address
         )
@@ -107,16 +115,16 @@ def my_bookings(request):
     return render(request, "bookings/my_bookings.html", {"bookings": bookings})
 
 
+# Write review
 @login_required
 def write_review(request, booking_id):
+
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
-    # Only allow reviews for completed bookings
     if booking.status != 'completed':
         messages.error(request, 'You can only review a completed booking.')
         return redirect('bookings:booking_history')
 
-    # Prevent duplicate reviews
     if Review.objects.filter(service=booking.service, user=request.user).exists():
         messages.warning(request, 'You have already reviewed this service.')
         return redirect('services:service_detail', service_id=booking.service.id)
@@ -134,7 +142,6 @@ def write_review(request, booking_id):
             messages.error(request, 'Rating must be between 1 and 5.')
             return render(request, 'bookings/write_review.html', {'booking': booking})
 
-        # Create the review
         Review.objects.create(
             service=booking.service,
             user=request.user,
@@ -142,9 +149,9 @@ def write_review(request, booking_id):
             comment=comment,
         )
 
-        # Recalculate and update the service average rating
         service = booking.service
         aggregated = Review.objects.filter(service=service).aggregate(average=Avg('rating'))
+
         service.rating = round(aggregated['average'] or 0, 1)
         service.rating_count = Review.objects.filter(service=service).count()
         service.save()
