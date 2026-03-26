@@ -66,9 +66,11 @@ def process_payment(request, booking_id):
 
 def payment_success(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
+    payment = Payment.objects.filter(booking=booking).first()
 
     return render(request, 'payments/success.html', {
         'booking': booking,
+        'payment': payment,
         'user_name': booking.user.email,
     })
 

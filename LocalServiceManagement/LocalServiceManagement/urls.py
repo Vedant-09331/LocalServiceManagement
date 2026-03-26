@@ -26,6 +26,8 @@ urlpatterns = [
     path('bookings/', include(('bookings.urls', 'bookings'), namespace='bookings')),
     path("payments/", include(("payments.urls", "payments"), namespace="payments")),
     path('vendors/', include('vendors.urls')),
+    path('chat/', include('chat.urls')),
+
 ]
 
 # Serve media files during development

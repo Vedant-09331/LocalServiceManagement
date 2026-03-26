@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Avg
-from urllib3 import request
+from django.db.models import Avg, Q
+from django.http import JsonResponse
 from .models import Favorite, Review, Service, Category
 from .forms import ServiceForm
 from professionals.models import Professional
@@ -50,7 +50,12 @@ def services_list(request):
     services = Service.objects.all()
 
     if query:
-        services = services.filter(name__icontains=query) | services.filter(description__icontains=query)
+        services = services.filter(
+            Q(title__icontains=query) |
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        ).distinct()
     if category_id:
         services = services.filter(category_id=category_id)
 
@@ -188,3 +193,32 @@ def favorite_list(request):
     return render(request, "services/favorite_list.html", {
         "favorites": favorites
     })
+
+
+def search_services(request):
+    """
+    JSON endpoint for live search. Returns matching services as JSON.
+    Called via fetch() as the user types.
+    """
+    query = request.GET.get('q', '').strip()
+    results = []
+
+    if query:
+        services = Service.objects.filter(
+            Q(title__icontains=query) |
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        ).distinct()[:10]  # limit to 10 live suggestions
+
+        for s in services:
+            results.append({
+                'id': s.id,
+                'name': s.name or s.title,
+                'description': (s.description[:80] + '...') if len(s.description) > 80 else s.description,
+                'price': str(s.price),
+                'category': s.category.name if s.category else '',
+                'image': s.image.url if s.image else None,
+            })
+
+    return JsonResponse({'results': results})

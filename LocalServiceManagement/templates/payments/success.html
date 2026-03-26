@@ -30,9 +30,17 @@
                         <div class="col-md-6">
                             <h6>Payment Details</h6>
                             <p><strong>Amount Paid:</strong> ₹{{ payment.amount }}</p>
-                            <p><strong>Payment ID:</strong> {{ payment.razorpay_payment_id }}</p>
+                            <p><strong>Payment ID:</strong> {{ payment.razorpay_payment_id|default:"N/A" }}</p>
                             <p><strong>Status:</strong>
-                                <span class="badge bg-success">{{ payment.get_payment_status_display }}</span>
+                                {% with status=payment.payment_status|default:booking.payment_status %}
+                                    {% if status == "completed" or status == "paid" %}
+                                        <span class="badge bg-success">{{ status|capfirst }}</span>
+                                    {% elif status == "pending" %}
+                                        <span class="badge bg-warning text-dark">{{ status|capfirst }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ status|capfirst }}</span>
+                                    {% endif %}
+                                {% endwith %}
                             </p>
                         </div>
                     </div>

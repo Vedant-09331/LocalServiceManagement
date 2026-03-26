@@ -28,8 +28,6 @@ SERVICES_DATA = [
             "cleaning products are provided by us."
         ),
         "price": 799.00,
-        "city": "Mumbai",
-        "location": "Mumbai, Maharashtra",
         "image_src": "home_cleaning.png",
         "professional_name": "Rajesh Kumar",
         "experience": 5,
@@ -46,8 +44,6 @@ SERVICES_DATA = [
             "and ensure quality workmanship."
         ),
         "price": 499.00,
-        "city": "Delhi",
-        "location": "Delhi, NCR",
         "image_src": "plumbing.png",
         "professional_name": "Suresh Sharma",
         "experience": 8,
@@ -64,8 +60,6 @@ SERVICES_DATA = [
             "protocols strictly."
         ),
         "price": 399.00,
-        "city": "Bangalore",
-        "location": "Bangalore, Karnataka",
         "image_src": "electrical.png",
         "professional_name": "Amit Patel",
         "experience": 6,
@@ -82,8 +76,6 @@ SERVICES_DATA = [
             "used are premium and hygienic."
         ),
         "price": 999.00,
-        "city": "Mumbai",
-        "location": "Mumbai, Maharashtra",
         "image_src": "salon_beauty.png",
         "professional_name": "Priya Mehta",
         "experience": 7,
@@ -100,8 +92,6 @@ SERVICES_DATA = [
             "home and is effective for up to 3 months."
         ),
         "price": 1299.00,
-        "city": "Hyderabad",
-        "location": "Hyderabad, Telangana",
         "image_src": "pest_control.png",
         "professional_name": "Venkat Rao",
         "experience": 10,
@@ -118,8 +108,6 @@ SERVICES_DATA = [
             "and durable results for all your wooden work needs."
         ),
         "price": 599.00,
-        "city": "Pune",
-        "location": "Pune, Maharashtra",
         "image_src": "carpentry.png",
         "professional_name": "Mohan Das",
         "experience": 9,
@@ -156,7 +144,6 @@ class Command(BaseCommand):
             user=vendor_user,
             defaults={
                 "phone": "9876543210",
-                "address": "123 Service Lane, Mumbai, Maharashtra",
                 "is_verified": True,
             },
         )
@@ -203,8 +190,6 @@ class Command(BaseCommand):
                     "name": data["name"],
                     "description": data["description"],
                     "price": data["price"],
-                    "city": data["city"],
-                    "location": data["location"],
                     "category": category,
                     "image": image_relative_path or "",
                     "rating": 0,

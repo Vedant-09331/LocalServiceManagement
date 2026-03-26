@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+<h2>Chat</h2>
+
+<div id="chat-box" style="height:300px; overflow-y:scroll; border:1px solid black;">
+    {% for msg in messages %}
+        <p><b>{{ msg.sender.username }}:</b> {{ msg.message }}</p>
+    {% endfor %}
+</div>
+
+<input type="text" id="message-input" placeholder="Type message...">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+function sendMessage() {
+    let message = $('#message-input').val();
+
+    $.ajax({
+        url: "/chat/send/",
+        type: "POST",
+        data: {
+            'message': message,
+            'room_id': "{{ room.id }}",
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(data) {
+            $('#chat-box').append("<p><b>" + data.sender + ":</b> " + data.message + "</p>");
+            $('#message-input').val('');
+        }
+    });
+}
+</script>
+
+</body>
+</html>

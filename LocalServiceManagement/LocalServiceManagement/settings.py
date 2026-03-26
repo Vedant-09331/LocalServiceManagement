@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'payments',
     'professionals',
     'vendors',
+    'chat',
 ]
 
 
