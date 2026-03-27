@@ -172,6 +172,36 @@ transition:0.4s;
 transform:scale(1.08);
 }
 
+/* ROLE SELECTION (SIGNUP PAGE) */
+
+.role-box {
+    border: 2px solid #e5e7eb;
+    padding: 15px 25px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+    flex: 1;
+    text-align: center;
+}
+
+.role-box input {
+    display: none;
+}
+
+.role-box:hover {
+    border-color: #3b82f6;
+    background: #f0f7ff;
+}
+
+.role-box span {
+    display: block;
+}
+
+.role-box input:checked + span {
+    color: #2563eb;
+    font-weight: 600;
+}
 
 /* RATING */
 
@@ -334,9 +364,9 @@ transform:translateY(0);
 
 </nav>
 
-
 <!-- HERO -->
 
+{% block hero %}
 <div class="hero">
 
 <div class="container">
@@ -366,6 +396,7 @@ transform:translateY(0);
 </div>
 
 </div>
+{% endblock %}
 
 
 <!-- PAGE CONTENT -->

@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Avg
 
 from .forms import UserLoginForm, UserSignupForm
-from services.models import Service, Category
-from bookings.models import Booking   # ✅ IMPORTANT
+from services.models import Service, Category, Review
+from bookings.models import Booking
 
 
 # ---------------- HOME ---------------- #
@@ -40,10 +41,13 @@ def home(request):
 def usersignupView(request):
     if request.method == 'POST':
         form = UserSignupForm(request.POST)
+
         if form.is_valid():
-            form.save()
+            user = form.save()  # ✅ UserCreationForm handles password + role
+
             messages.success(request, "Account created successfully!")
             return redirect('core:login')
+
     else:
         form = UserSignupForm()
 
@@ -64,7 +68,7 @@ def userloginView(request):
             if user:
                 login(request, user)
 
-                # ROLE BASED REDIRECT
+                # ✅ ROLE BASED REDIRECT
                 if user.role == 'admin':
                     return redirect('core:admin_dashboard')
                 elif user.role == 'vendor':
@@ -95,23 +99,22 @@ def userDashboard(request):
     if request.user.role != 'user':
         return redirect('core:login')
 
-    bookings = Booking.objects.filter(user=request.user).select_related('service', 'vendor').order_by('-created_at')
+    bookings = Booking.objects.filter(user=request.user).select_related('service').order_by('-created_at')
 
     upcoming_bookings = bookings.filter(status__in=['pending', 'confirmed'])
-    past_bookings     = bookings.filter(status='completed')
-    recent_bookings   = bookings[:5]
+    past_bookings = bookings.filter(status='completed')
+    recent_bookings = bookings[:5]
 
-    # Services for Browse panel
     services = Service.objects.all().select_related('category')[:6]
     categories = Category.objects.all()
 
     return render(request, 'core/user_dashboard.html', {
         'bookings': bookings,
         'upcoming_count': upcoming_bookings.count(),
-        'past_count':     past_bookings.count(),
+        'past_count': past_bookings.count(),
         'upcoming_bookings': upcoming_bookings[:5],
-        'recent_bookings':   recent_bookings,
-        'services':   services,
+        'recent_bookings': recent_bookings,
+        'services': services,
         'categories': categories,
     })
 
@@ -131,64 +134,66 @@ def adminDashboard(request):
     })
 
 
-# ---------------- VENDOR DASHBOARD 🔥 ---------------- #
+# ---------------- VENDOR DASHBOARD ---------------- #
 @login_required
 def vendorDashboard(request):
-    # 🔒 सुरक्षा: only vendor
     if request.user.role != 'vendor':
         return redirect('core:login')
 
     user = request.user
 
-    # 📦 All bookings of this vendor
-    bookings = Booking.objects.filter(
-        professional=user
-    ).order_by('-created_at')
+    # Get the Vendor profile linked to this user (may not exist yet)
+    from vendors.models import Vendor
+    try:
+        vendor = Vendor.objects.get(user=user)
+    except Vendor.DoesNotExist:
+        vendor = None
 
-    # 📊 Stats
+    if vendor:
+        bookings = Booking.objects.filter(vendor=vendor).select_related('user', 'service').order_by('-created_at')
+        # Services linked to this vendor user (Service.vendor is a FK to auth user)
+        services = Service.objects.filter(vendor=user)
+    else:
+        bookings = Booking.objects.none()
+        services = Service.objects.none()
+
     total_bookings = bookings.count()
     pending = bookings.filter(status='pending').count()
     completed = bookings.filter(status='completed').count()
 
-    # 💰 Earnings (only completed bookings)
+    # Earnings from completed bookings (sum of service prices)
     earnings = bookings.filter(status='completed').aggregate(
         total=Sum('service__price')
     )['total'] or 0
 
-    # ⭐ Rating (average of all reviews)
+    # Average rating across vendor's services
     rating = Review.objects.filter(
         service__vendor=user
     ).aggregate(
         avg=Avg('rating')
     )['avg'] or 0
 
-    # 🛠 Vendor services
-    services = Service.objects.filter(vendor=user)
-
-    # 📅 Recent bookings (for dashboard table)
     recent_bookings = bookings[:5]
 
     return render(request, 'core/vendor_dashboard.html', {
+        'vendor': vendor,
         'bookings': bookings,
         'recent_bookings': recent_bookings,
-
         'total_bookings': total_bookings,
         'pending': pending,
         'completed': completed,
-
         'earnings': earnings,
         'rating': round(rating, 1),
-
-        'services': services
+        'services': services,
     })
 
 
-# ---------------- UPDATE BOOKING STATUS 🔥 ---------------- #
+
+# ---------------- UPDATE BOOKING STATUS ---------------- #
 @login_required
 def updateBookingStatus(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
-    # SECURITY CHECK
     if booking.professional != request.user:
         messages.error(request, "Unauthorized access")
         return redirect('core:vendor_dashboard')
@@ -211,6 +216,7 @@ def userlogoutView(request):
 
 
 # ---------------- VENDOR PROFILE ---------------- #
+@login_required
 def vendor_profile(request):
     if request.user.role != 'vendor':
         return redirect('core:login')
@@ -219,7 +225,7 @@ def vendor_profile(request):
 
     if request.method == 'POST':
         user.bio = request.POST.get('bio')
-        
+
         if request.FILES.get('profile_image'):
             user.profile_image = request.FILES.get('profile_image')
 
@@ -227,3 +233,16 @@ def vendor_profile(request):
         messages.success(request, "Profile updated successfully")
 
     return render(request, 'core/vendor_profile.html')
+
+def register(request):
+    if request.method == "POST":
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('core:login')
+        else:
+            print(form.errors)  # 👈 ADD THIS (VERY IMPORTANT)
+    else:
+        form = UserRegisterForm()
+
+    return render(request, 'core/register.html', {'form': form})

@@ -6,6 +6,13 @@ class VendorRegisterForm(forms.ModelForm):
     class Meta:
         model = Vendor
         fields = ['service', 'phone', 'experience', 'profile_image']
+        widgets = {
+            'service': forms.Select(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 9876543210'}),
+            'experience': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': 'Years of experience'}),
+            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
 
 
 class VendorProfileForm(forms.ModelForm):

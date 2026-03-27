@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Sign Up | Local Service Management{% endblock %}
 
+{% block hero %}
+{% endblock %}
+
 {% block content %}
 <div class="auth-wrapper">
     <div class="glass-card">
@@ -8,15 +11,29 @@
         <h2 class="text-center mb-1">Create account</h2>
         <p class="text-center mb-4">Get started with Local Service Management</p>
 
-        {% if error %}
-            <div class="alert alert-danger text-center">
-                {{ error }}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div>{{ field.label }}: {{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+            {% endfor %}
         {% endif %}
 
         <form method="post">
             {% csrf_token %}
 
+            <!-- EMAIL -->
             <div class="mb-3">
                 <label class="form-label">Email address</label>
                 <input type="email"
@@ -26,14 +43,40 @@
                        required>
             </div>
 
+            <!-- ROLE SELECTION 🔥 -->
+            <div class="mb-3">
+                <label class="form-label">Select Account Type</label>
+
+                <div class="d-flex gap-3">
+
+                    <label class="role-box">
+                        <input type="radio" name="role" value="user" required>
+                        <span>👤 User</span>
+                    </label>
+
+                    <label class="role-box">
+                        <input type="radio" name="role" value="vendor">
+                        <span>🏪 Vendor</span>
+                    </label>
+
+                    <label class="role-box">
+                        <input type="radio" name="role" value="admin">
+                        <span>🛠 Admin</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <!-- PASSWORD -->
             <div class="mb-3">
                 <label class="form-label">Password</label>
                 <input type="password"
-                       name="password"
+                       name="password1"
                        class="form-control"
                        required>
             </div>
 
+            <!-- CONFIRM PASSWORD -->
             <div class="mb-4">
                 <label class="form-label">Confirm password</label>
                 <input type="password"
@@ -56,4 +99,32 @@
 
     </div>
 </div>
+
+<!-- OPTIONAL STYLING 🔥 -->
+<style>
+.role-box {
+    flex: 1;
+    border: 2px solid #e5e7eb;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.role-box input {
+    display: none;
+}
+
+.role-box:hover {
+    border-color: #2563eb;
+    background: #f0f7ff;
+}
+
+.role-box input:checked + span {
+    color: #2563eb;
+    font-weight: 600;
+}
+</style>
+
 {% endblock %}

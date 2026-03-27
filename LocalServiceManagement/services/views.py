@@ -187,13 +187,6 @@ def toggle_favorite(request, service_id):
 
     return redirect('services:service_detail', service_id=service.id)
 
-@login_required
-def favorite_list(request):
-    favorites = Favorite.objects.filter(user=request.user)
-    return render(request, "services/favorite_list.html", {
-        "favorites": favorites
-    })
-
 
 def search_services(request):
     """
@@ -222,3 +215,28 @@ def search_services(request):
             })
 
     return JsonResponse({'results': results})
+
+@login_required
+def toggle_favorite(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+
+    favorite = Favorite.objects.filter(
+        user=request.user,
+        service=service
+    ).first()
+
+    if favorite:
+        favorite.delete()   # Remove from favorites
+    else:
+        Favorite.objects.create(user=request.user, service=service)  # Add
+
+    return redirect(request.META.get('HTTP_REFERER', 'core:home'))
+
+
+@login_required
+def favorite_list(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('service')
+
+    return render(request, "services/favorite_list.html", {
+        "favorites": favorites
+    })

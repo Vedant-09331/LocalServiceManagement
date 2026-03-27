@@ -46,7 +46,16 @@
 {% for service in services %}
 
   <div class="col-md-4 col-lg-3">
-    <div class="card service-card h-100">
+    <div class="card service-card h-100 position-relative">
+
+      <!-- ❤️ FAVORITE BUTTON (TOP RIGHT) -->
+      {% if user.is_authenticated %}
+      <a href="{% url 'services:toggle_favorite' service.id %}"
+         class="btn btn-danger position-absolute"
+         style="top:10px; right:10px; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+         ❤️
+      </a>
+      {% endif %}
 
       {% if service.image %}
         <img src="{{ service.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
@@ -58,6 +67,7 @@
         <span class="badge bg-primary bg-opacity-10 text-primary small mb-1">{{ service.category }}</span>
         <h5 class="card-title fw-bold mt-1">{{ service.name }}</h5>
         <p class="text-muted small">{{ service.description|truncatewords:12 }}</p>
+
         <div class="d-flex justify-content-between align-items-center mt-2">
           <span class="fw-bold text-primary">₹{{ service.price }}</span>
           <span class="rating">
@@ -95,104 +105,4 @@
 
 </div>
 
-{% endblock %}
-
-
-{% block scripts %}
-<script>
-(function () {
-  const input       = document.getElementById('searchInput');
-  const suggestBox  = document.getElementById('liveSuggestions');
-  const suggestList = document.getElementById('suggestionList');
-  const SEARCH_URL  = "{% url 'services:search_services' %}";
-
-  let debounceTimer = null;
-
-  // ─── Live suggestions as user types ────────────────────────────────────────
-  input.addEventListener('input', function () {
-    const q = this.value.trim();
-    clearTimeout(debounceTimer);
-
-    if (q.length < 1) {
-      hideSuggestions();
-      return;
-    }
-
-    debounceTimer = setTimeout(() => fetchSuggestions(q), 250);
-  });
-
-  function fetchSuggestions(q) {
-    fetch(`${SEARCH_URL}?q=${encodeURIComponent(q)}`)
-      .then(r => r.json())
-      .then(data => renderSuggestions(data.results, q))
-      .catch(() => hideSuggestions());
-  }
-
-  function renderSuggestions(results, q) {
-    suggestList.innerHTML = '';
-
-    if (results.length === 0) {
-      suggestList.innerHTML = `
-        <li class="list-group-item text-muted py-3 text-center">
-          <i class="fa-solid fa-circle-xmark me-1"></i> No services found for "<strong>${escHtml(q)}</strong>"
-        </li>`;
-      showSuggestions();
-      return;
-    }
-
-    results.forEach(s => {
-      const li = document.createElement('li');
-      li.className = 'list-group-item list-group-item-action d-flex align-items-center gap-3 py-2';
-      li.style.cursor = 'pointer';
-      li.innerHTML = `
-        <img src="${s.image || 'https://via.placeholder.com/48x48?text=S'}"
-             style="width:48px;height:48px;object-fit:cover;border-radius:10px;" alt="">
-        <div class="flex-grow-1 overflow-hidden">
-          <div class="fw-semibold text-truncate">${escHtml(s.name)}</div>
-          <div class="text-muted small text-truncate">${escHtml(s.description)}</div>
-        </div>
-        <div class="text-end flex-shrink-0">
-          <div class="fw-bold text-primary small">₹${escHtml(s.price)}</div>
-          <div class="badge bg-light text-secondary small border">${escHtml(s.category)}</div>
-        </div>`;
-
-      li.addEventListener('click', () => {
-        window.location.href = `/services/detail/${s.id}/`;
-      });
-
-      suggestList.appendChild(li);
-    });
-
-    // "See all results" footer
-    const footer = document.createElement('li');
-    footer.className = 'list-group-item text-center small text-primary py-2';
-    footer.style.cursor = 'pointer';
-    footer.innerHTML = `<i class="fa-solid fa-list me-1"></i> See all results for "<strong>${escHtml(q)}</strong>"`;
-    footer.addEventListener('click', () => {
-      document.getElementById('searchForm').submit();
-    });
-    suggestList.appendChild(footer);
-
-    showSuggestions();
-  }
-
-  function showSuggestions() { suggestBox.style.display = 'block'; }
-  function hideSuggestions() { suggestBox.style.display = 'none'; }
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ─── Hide when clicking outside ────────────────────────────────────────────
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('#searchInput') && !e.target.closest('#liveSuggestions')) {
-      hideSuggestions();
-    }
-  });
-
-  // ─── Re-show on focus if there's a query ───────────────────────────────────
-  input.addEventListener('focus', function () {
-    if (this.value.trim().length > 0) fetchSuggestions(this.value.trim());
-  });
-})();
-</script>
 {% endblock %}

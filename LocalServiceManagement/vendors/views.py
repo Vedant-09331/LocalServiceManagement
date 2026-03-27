@@ -28,23 +28,17 @@ def vendor_register(request):
         return redirect('vendors:vendor_dashboard')
 
     if request.method == 'POST':
-        service = request.POST.get('service')
-        phone = request.POST.get('phone')
-        experience = request.POST.get('experience')
-        profile_image = request.FILES.get('profile_image')
+        form = VendorRegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            vendor = form.save(commit=False)
+            vendor.user = request.user
+            vendor.save()
+            messages.success(request, "Vendor profile created successfully!")
+            return redirect('vendors:vendor_dashboard')
+    else:
+        form = VendorRegisterForm()
 
-        Vendor.objects.create(
-            user=request.user,
-            service_id=service,
-            phone=phone,
-            experience=experience,
-            profile_image=profile_image,
-        )
-
-        messages.success(request, "Vendor profile created successfully!")
-        return redirect('vendors:vendor_dashboard')
-
-    return render(request, 'vendors/register.html')
+    return render(request, 'vendors/register.html', {'form': form})
 
 
 # ── Dashboard ──────────────────────────────────────────────────────────────────

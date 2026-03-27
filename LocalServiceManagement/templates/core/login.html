@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Local Service Management{% endblock %}
 
+{% block hero %}
+{% endblock %}
+
 {% block content %}
 <div class="auth-wrapper">
     <div class="glass-card">
@@ -8,10 +11,10 @@
         <h2 class="text-center mb-1">Local Service Management</h2>
         <p class="text-center mb-4">Sign in to your account</p>
 
-        {% if error %}
-            <div class="alert alert-danger text-center">
-                {{ error }}
-            </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger text-center">{{ message }}</div>
+            {% endfor %}
         {% endif %}
 
         <form method="POST">

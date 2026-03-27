@@ -12,6 +12,7 @@
     <style>
         body {
             background: #f4f6f9;
+            font-family: 'Poppins', sans-serif;
         }
 
         /* Sidebar */
@@ -29,6 +30,7 @@
             color: #cbd5e1;
             padding: 12px 20px;
             text-decoration: none;
+            transition: 0.2s;
         }
 
         .sidebar a:hover {
@@ -36,15 +38,22 @@
             color: white;
         }
 
+        .sidebar a.active {
+            background: #1f2937;
+            color: #38bdf8;
+            border-left: 3px solid #38bdf8;
+        }
+
         /* Content */
         .content {
             margin-left: 240px;
-            padding: 20px;
+            padding: 24px;
         }
 
         .card {
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: none;
         }
 
         .card:hover {
@@ -55,71 +64,114 @@
         .stat-card {
             color: white;
         }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
 
-<!-- 🔥 SIDEBAR -->
+<!-- SIDEBAR -->
 <div class="sidebar">
-    <h4 class="text-center">⚡ LSM</h4>
-    <hr>
+    <h4 class="text-center py-2">⚡ LSM</h4>
+    <hr class="border-secondary">
 
-    <a href="#"><i class="fa fa-home"></i> Dashboard</a>
-    <a href="#"><i class="fa fa-briefcase"></i> My Services</a>
-    <a href="#"><i class="fa fa-calendar"></i> Bookings</a>
-    <a href="#"><i class="fa fa-wallet"></i> Earnings</a>
-    <a href="#"><i class="fa fa-user"></i> Profile</a>
-    <a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    <a href="{% url 'core:vendor_dashboard' %}" class="active">
+        <i class="fa fa-home me-2"></i> Dashboard
+    </a>
+    <a href="{% url 'vendors:vendor_my_services' %}">
+        <i class="fa fa-briefcase me-2"></i> My Services
+    </a>
+    <a href="{% url 'vendors:vendor_bookings' %}">
+        <i class="fa fa-calendar me-2"></i> Bookings
+    </a>
+    <a href="{% url 'vendors:vendor_earnings' %}">
+        <i class="fa fa-wallet me-2"></i> Earnings
+    </a>
+    <a href="{% url 'vendors:vendor_profile' %}">
+        <i class="fa fa-user me-2"></i> Profile
+    </a>
+    <a href="{% url 'core:logout' %}">
+        <i class="fa fa-sign-out-alt me-2"></i> Logout
+    </a>
 </div>
 
-<!-- 🔥 MAIN CONTENT -->
+<!-- MAIN CONTENT -->
 <div class="content">
 
     <!-- TOP BAR -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>👋 Welcome, {{ request.user.username }}</h3>
-        <span class="badge bg-success">Vendor</span>
+        <h3>👋 Welcome, {{ vendor.user.get_full_name|default:request.user.email }}</h3>
+        <span class="badge bg-success fs-6">Vendor</span>
     </div>
 
-    <!-- 📊 STATS -->
-    <div class="row mb-4">
+    <!-- STATS -->
+    <div class="row mb-4 g-3">
 
         <div class="col-md-3">
             <div class="card stat-card bg-primary p-3">
-                <h6>Total Bookings</h6>
-                <h3>{{ total_bookings }}</h3>
+                <h6><i class="fa fa-calendar-check me-1"></i> Total Bookings</h6>
+                <h3 class="mb-0">{{ total_bookings }}</h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card stat-card bg-success p-3">
-                <h6>Earnings</h6>
-                <h3>₹{{ earnings }}</h3>
+                <h6><i class="fa fa-indian-rupee-sign me-1"></i> Earnings</h6>
+                <h3 class="mb-0">₹{{ earnings }}</h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card stat-card bg-warning p-3">
-                <h6>Rating</h6>
-                <h3>{{ rating }} ⭐</h3>
+                <h6><i class="fa fa-star me-1"></i> Rating</h6>
+                <h3 class="mb-0">{{ rating }} ⭐</h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card stat-card bg-dark p-3">
-                <h6>Completed Jobs</h6>
-                <h3>{{ completed }}</h3>
+                <h6><i class="fa fa-briefcase me-1"></i> Completed Jobs</h6>
+                <h3 class="mb-0">{{ completed }}</h3>
             </div>
         </div>
 
     </div>
 
-    <!-- 📅 BOOKINGS -->
-    <div class="card p-4">
-        <h4 class="mb-3">📅 Recent Bookings</h4>
+    <!-- MY SERVICES -->
+    {% if services %}
+    <div class="card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">🛠️ My Services</h5>
+            <a href="{% url 'vendors:vendor_my_services' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="row g-3">
+            {% for service in services|slice:":3" %}
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 h-100">
+                    <h6 class="fw-bold">{{ service.title|default:service.name }}</h6>
+                    <p class="text-muted small mb-1"><i class="fa fa-tag me-1"></i>{{ service.category.name }}</p>
+                    <span class="fw-bold text-primary">₹{{ service.price }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
-        <table class="table table-hover">
-            <thead>
+    <!-- RECENT BOOKINGS -->
+    <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">📅 Recent Bookings</h5>
+            <a href="{% url 'vendors:vendor_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
                 <tr>
                     <th>Customer</th>
                     <th>Service</th>
@@ -130,50 +182,47 @@
             </thead>
 
             <tbody>
-                {% for booking in bookings %}
+                {% for booking in recent_bookings %}
                 <tr>
-                    <td>{{ booking.user.username }}</td>
-                    <td>{{ booking.service.name }}</td>
-                    <td>{{ booking.date }} {{ booking.time }}</td>
+                    <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                    <td>{{ booking.service.title|default:booking.service.name }}</td>
+                    <td>
+                        {{ booking.booking_date }}
+                        {% if booking.booking_time %} {{ booking.booking_time }}{% endif %}
+                    </td>
 
                     <td>
                         {% if booking.status == 'completed' %}
-                            <span class="badge bg-success">Completed</span>
+                            <span class="badge bg-success badge-status">Completed</span>
                         {% elif booking.status == 'pending' %}
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        {% elif booking.status == 'accepted' %}
-                            <span class="badge bg-primary">Accepted</span>
-                        {% elif booking.status == 'in_progress' %}
-                            <span class="badge bg-info text-dark">In Progress</span>
+                            <span class="badge bg-warning text-dark badge-status">Pending</span>
+                        {% elif booking.status == 'confirmed' %}
+                            <span class="badge bg-primary badge-status">Confirmed</span>
                         {% else %}
-                            <span class="badge bg-danger">Cancelled</span>
+                            <span class="badge bg-danger badge-status">Cancelled</span>
                         {% endif %}
                     </td>
 
                     <td>
-                        <form method="POST" action="{% url 'core:update_booking' booking.id %}">
-                            {% csrf_token %}
-
-                            {% if booking.status == 'pending' %}
-                                <button class="btn btn-success btn-sm" name="status" value="accepted">Accept</button>
-                                <button class="btn btn-danger btn-sm" name="status" value="cancelled">Cancel</button>
-
-                            {% elif booking.status == 'accepted' %}
-                                <button class="btn btn-primary btn-sm" name="status" value="in_progress">Start</button>
-
-                            {% elif booking.status == 'in_progress' %}
-                                <button class="btn btn-dark btn-sm" name="status" value="completed">Complete</button>
-
-                            {% else %}
-                                <span class="text-muted">No actions</span>
-                            {% endif %}
-                        </form>
+                        {% if booking.status == 'pending' %}
+                            <a href="{% url 'vendors:accept_booking' booking.id %}" class="btn btn-success btn-sm">Accept</a>
+                            <a href="{% url 'vendors:reject_booking' booking.id %}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Decline this booking?')">Decline</a>
+                        {% elif booking.status == 'confirmed' %}
+                            <a href="{% url 'vendors:complete_booking' booking.id %}" class="btn btn-primary btn-sm">Complete</a>
+                        {% else %}
+                            <span class="text-muted small">—</span>
+                        {% endif %}
                     </td>
                 </tr>
 
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">No bookings yet</td>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="fa fa-calendar-xmark fa-2x mb-2 d-block"></i>
+                        No bookings yet
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -183,5 +232,7 @@
 
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
