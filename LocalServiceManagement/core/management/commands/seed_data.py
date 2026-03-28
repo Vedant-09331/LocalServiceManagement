@@ -54,13 +54,13 @@ class Command(BaseCommand):
         vendor_user2.last_name = 'Kumar'
         vendor_user2.save()
 
-        admin_user, _ = User.objects.get_or_create(
-            email='admin@test.com',
-            defaults={'role': 'admin', 'is_staff': True}
-        )
+        admin_user, _ = User.objects.get_or_create(email='admin@test.com')
         admin_user.set_password('testpassword123')
         admin_user.first_name = 'Admin'
         admin_user.last_name = 'User'
+        admin_user.role = 'admin'
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
         admin_user.save()
 
         self.stdout.write(self.style.SUCCESS("✅ Users created"))
