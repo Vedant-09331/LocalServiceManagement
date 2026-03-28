@@ -1,0 +1,13 @@
+--- Test Users ---
+
+Role: Admin
+Email: admin@test.com
+Password: testpassword123
+
+Role: Vendor
+Email: vendor@test.com
+Password: testpassword123
+
+Role: User
+Email: user@test.com
+Password: testpassword123

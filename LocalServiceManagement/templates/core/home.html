@@ -46,7 +46,45 @@ Explore Services
 
 <div class="col-md-6 text-center">
 
-<img src="{% static 'images/home-services.png' %}" class="hero-img">
+<div class="hero-illustration">
+  <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+    <!-- Background Circle -->
+    <circle cx="250" cy="200" r="170" fill="rgba(255,255,255,0.1)"/>
+    <circle cx="250" cy="200" r="130" fill="rgba(255,255,255,0.08)"/>
+
+    <!-- House -->
+    <polygon points="250,60 130,150 370,150" fill="#ffe082" stroke="white" stroke-width="2"/>
+    <rect x="160" y="150" width="180" height="130" rx="5" fill="white" opacity="0.95"/>
+    <rect x="175" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
+    <rect x="275" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
+    <rect x="220" y="220" width="60" height="60" rx="3" fill="#a5d6a7"/>
+    <circle cx="270" cy="250" r="4" fill="#666"/>
+
+    <!-- Chimney -->
+    <rect x="300" y="80" width="25" height="70" rx="3" fill="#bcaaa4"/>
+
+    <!-- Worker -->
+    <circle cx="110" cy="260" r="22" fill="#ffcc80"/>
+    <rect x="90" y="282" width="40" height="55" rx="5" fill="#42a5f5"/>
+    <rect x="85" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
+    <rect x="115" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
+    <!-- Hard Hat -->
+    <ellipse cx="110" cy="242" rx="26" ry="10" fill="#fdd835"/>
+    <rect x="96" y="235" width="28" height="8" rx="2" fill="#f9a825"/>
+    <!-- Wrench -->
+    <line x1="130" y1="295" x2="160" y2="270" stroke="#78909c" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="163" cy="267" r="8" fill="none" stroke="#78909c" stroke-width="3"/>
+
+    <!-- Sparkles -->
+    <text x="370" y="120" font-size="28" fill="#ffe082" opacity="0.9">✨</text>
+    <text x="90" y="130" font-size="22" fill="#ffe082" opacity="0.7">⭐</text>
+    <text x="390" y="250" font-size="20" fill="white" opacity="0.6">✦</text>
+
+    <!-- Tools -->
+    <rect x="370" y="290" width="60" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <text x="380" y="308" font-size="12" fill="white" font-weight="600">🔧🔨🪛</text>
+  </svg>
+</div>
 
 </div>
 
@@ -290,7 +328,7 @@ margin-top:15px;
 border-radius:30px;
 }
 
-.hero-img{
+.hero-illustration{
 max-width:100%;
 animation: float 5s ease-in-out infinite;
 }

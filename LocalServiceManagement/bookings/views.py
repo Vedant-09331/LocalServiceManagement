@@ -16,8 +16,8 @@ def book_service(request, id):
 
     professional = Professional.objects.filter(service=service).first()
 
-    # ✅ FIXED vendor fetch
-    vendor = Vendor.objects.filter(service=service).first()
+    # ✅ FIXED vendor fetch: find the Vendor instance linked to the User who owns the service
+    vendor = Vendor.objects.filter(user=service.vendor).first()
 
     # Safety check
     if not vendor:
@@ -78,8 +78,8 @@ def confirm_booking(request, service_id, professional_id):
 
     reviews = Review.objects.filter(service=service)
 
-    # ✅ FIXED
-    vendor = service.vendor
+    # ✅ FIXED: Find the Vendor instance associated with the service's owner (user)
+    vendor = Vendor.objects.filter(user=service.vendor).first()
 
     if not vendor:
         messages.error(request, "No vendor available for this service.")

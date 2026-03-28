@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from core.decorators import customer_required, admin_required
 from django.db.models import Sum, Avg
 
 from .forms import UserLoginForm, UserSignupForm
@@ -72,7 +73,7 @@ def userloginView(request):
                 if user.role == 'admin':
                     return redirect('core:admin_dashboard')
                 elif user.role == 'vendor':
-                    return redirect('core:vendor_dashboard')
+                    return redirect('vendors:vendor_dashboard')
                 else:
                     return redirect('core:home')
 
@@ -89,15 +90,13 @@ def dashboard(request):
     if request.user.role == 'admin':
         return redirect('core:admin_dashboard')
     elif request.user.role == 'vendor':
-        return redirect('core:vendor_dashboard')
+        return redirect('vendors:vendor_dashboard')
     return redirect('core:user_dashboard')
 
 
 # ---------------- USER DASHBOARD ---------------- #
-@login_required
+@customer_required
 def userDashboard(request):
-    if request.user.role != 'user':
-        return redirect('core:login')
 
     bookings = Booking.objects.filter(user=request.user).select_related('service').order_by('-created_at')
 
@@ -120,10 +119,8 @@ def userDashboard(request):
 
 
 # ---------------- ADMIN DASHBOARD ---------------- #
-@login_required
+@admin_required
 def adminDashboard(request):
-    if request.user.role != 'admin':
-        return redirect('core:login')
 
     users_count = Booking.objects.count()
     services_count = Service.objects.count()
@@ -134,58 +131,7 @@ def adminDashboard(request):
     })
 
 
-# ---------------- VENDOR DASHBOARD ---------------- #
-@login_required
-def vendorDashboard(request):
-    if request.user.role != 'vendor':
-        return redirect('core:login')
-
-    user = request.user
-
-    # Get the Vendor profile linked to this user (may not exist yet)
-    from vendors.models import Vendor
-    try:
-        vendor = Vendor.objects.get(user=user)
-    except Vendor.DoesNotExist:
-        vendor = None
-
-    if vendor:
-        bookings = Booking.objects.filter(vendor=vendor).select_related('user', 'service').order_by('-created_at')
-        # Services linked to this vendor user (Service.vendor is a FK to auth user)
-        services = Service.objects.filter(vendor=user)
-    else:
-        bookings = Booking.objects.none()
-        services = Service.objects.none()
-
-    total_bookings = bookings.count()
-    pending = bookings.filter(status='pending').count()
-    completed = bookings.filter(status='completed').count()
-
-    # Earnings from completed bookings (sum of service prices)
-    earnings = bookings.filter(status='completed').aggregate(
-        total=Sum('service__price')
-    )['total'] or 0
-
-    # Average rating across vendor's services
-    rating = Review.objects.filter(
-        service__vendor=user
-    ).aggregate(
-        avg=Avg('rating')
-    )['avg'] or 0
-
-    recent_bookings = bookings[:5]
-
-    return render(request, 'core/vendor_dashboard.html', {
-        'vendor': vendor,
-        'bookings': bookings,
-        'recent_bookings': recent_bookings,
-        'total_bookings': total_bookings,
-        'pending': pending,
-        'completed': completed,
-        'earnings': earnings,
-        'rating': round(rating, 1),
-        'services': services,
-    })
+# (Removed redundant vendorDashboard from core, use vendors app instead)
 
 
 
@@ -215,24 +161,7 @@ def userlogoutView(request):
     return redirect('core:login')
 
 
-# ---------------- VENDOR PROFILE ---------------- #
-@login_required
-def vendor_profile(request):
-    if request.user.role != 'vendor':
-        return redirect('core:login')
-
-    user = request.user
-
-    if request.method == 'POST':
-        user.bio = request.POST.get('bio')
-
-        if request.FILES.get('profile_image'):
-            user.profile_image = request.FILES.get('profile_image')
-
-        user.save()
-        messages.success(request, "Profile updated successfully")
-
-    return render(request, 'core/vendor_profile.html')
+# (Removed redundant vendor_profile from core, use vendors app instead)
 
 def register(request):
     if request.method == "POST":

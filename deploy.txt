@@ -1,0 +1,56 @@
+# Local Service Management - Render Deployment Guide
+
+This project is now fully configured for a seamless deployment on Render using Infrastructure as Code (`render.yaml`).
+
+## Prerequisites
+1. Ensure your code is pushed to a Git repository (GitHub/GitLab/Bitbucket).
+2. Create an account on [Render.com](https://render.com/).
+
+## Deployment Steps
+
+1. **Log in to Render**
+   Go to the Render Dashboard (https://dashboard.render.com/).
+
+2. **Connect your Repository**
+   If this is your first time, you may need to grant Render access to your GitHub/GitLab account.
+
+3. **Deploy via Blueprint (Blueprints)**
+   Instead of manually creating a Web Service and a PostgreSQL Database, you can deploy both automatically using the provided `render.yaml` file:
+   - Click the **"New"** button in the top right corner.
+   - Select **"Blueprint"** from the dropdown menu.
+   - Connect the repository where your code resides.
+   - Render will automatically read the `render.yaml` file in the root of your repository.
+
+4. **Review Resources**
+   Render will show you two services it plans to create:
+   - **PostgreSQL Database** (`localservice_db`)
+   - **Web Service** (`localservicemanagement`)
+   - The environment variables (`DATABASE_URL`, `SECRET_KEY`, etc.) will be automatically linked and generated.
+
+5. **Click "Apply"**
+   Render will begin deploying your Postgres database and Web Service.
+
+## Important Note on Media Files (Images)
+Render uses an ephemeral filesystem. Any images uploaded (Service images, profiles, etc.) will be **LOST** whenever your app redeploys or restarts.
+- **For Production**: I highly recommend integrating a cloud storage provider like **AWS S3** or **Cloudinary**.
+- **Current State**: The app stores media locally in `/media/`.
+
+## What Happens During Deployment?
+- Render reads `render.yaml`.
+- It executes the build command: `./build.sh` (this installs dependencies, enters the folder, collects static files, and runs migrations).
+- It executes the start command: `cd LocalServiceManagement && gunicorn LocalServiceManagement.wsgi:application`.
+
+## Environment Variables to Override
+Once deployed, you should go to your **Web Service -> Environment** in the Render Dashboard and manually add or change specific secrets:
+
+- `RAZORPAY_KEY_ID`: Your live/test Razorpay Key ID
+- `RAZORPAY_KEY_SECRET`: Your live/test Razorpay Key Secret
+- `DEBUG`: Set to `False` (automatically set in `render.yaml`)
+- `SECRET_KEY`: Set to a complex random string (automatically generated in `render.yaml`)
+
+## Need to run Admin commands?
+You can create your first admin user right from the Render Shell:
+1. In the Web Service dashboard, click **"Shell"**.
+2. Run: `cd LocalServiceManagement`
+3. Run: `python manage.py createsuperuser`
+4. Follow the prompts.

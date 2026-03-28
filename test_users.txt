@@ -1,0 +1,29 @@
+========================================
+  Local Service Management - Test Users
+========================================
+
+👤 CUSTOMERS
+─────────────────────────────────
+Email:    user@test.com
+Password: testpassword123
+Name:     Rahul Sharma
+
+Email:    user2@test.com
+Password: testpassword123
+Name:     Priya Singh
+
+🏪 VENDORS
+─────────────────────────────────
+Email:    vendor@test.com
+Password: testpassword123
+Name:     Amit Patel
+
+Email:    vendor2@test.com
+Password: testpassword123
+Name:     Sanjay Kumar
+
+🛠 ADMIN
+─────────────────────────────────
+Email:    admin@test.com
+Password: testpassword123
+Name:     Admin User

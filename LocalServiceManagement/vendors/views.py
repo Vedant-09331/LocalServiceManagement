@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from core.decorators import vendor_required
 from django.contrib import messages
 from django.db.models import Sum
 from services.forms import ServiceForm
@@ -43,7 +44,7 @@ def vendor_register(request):
 
 # ── Dashboard ──────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_dashboard(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -82,7 +83,7 @@ def vendor_dashboard(request):
 
 # ── Profile ────────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_profile(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -109,7 +110,7 @@ def vendor_profile(request):
 
 # ── Bookings ───────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_bookings(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -127,7 +128,7 @@ def vendor_bookings(request):
     })
 
 
-@login_required
+@vendor_required
 def accept_booking(request, booking_id):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -140,7 +141,7 @@ def accept_booking(request, booking_id):
     return redirect('vendors:vendor_dashboard')
 
 
-@login_required
+@vendor_required
 def reject_booking(request, booking_id):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -153,7 +154,7 @@ def reject_booking(request, booking_id):
     return redirect('vendors:vendor_dashboard')
 
 
-@login_required
+@vendor_required
 def complete_booking(request, booking_id):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -172,7 +173,7 @@ def complete_booking(request, booking_id):
 
 # ── Earnings ───────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_earnings(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -197,7 +198,7 @@ def vendor_earnings(request):
 
 # ── Reviews ────────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_reviews(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:
@@ -222,7 +223,7 @@ def vendor_reviews(request):
 
 # ── My Services ────────────────────────────────────────────────────────────────
 
-@login_required
+@vendor_required
 def vendor_my_services(request):
     vendor, redir = _get_vendor_or_redirect(request)
     if redir:

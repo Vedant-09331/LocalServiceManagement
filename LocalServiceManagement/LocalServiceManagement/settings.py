@@ -5,6 +5,7 @@ Django settings for LocalServiceManagement project.
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load environment variables
 load_dotenv()
@@ -16,10 +17,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY SETTINGS
 # ======================
 
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-x3lg_=q&mb0^ggb&%q#kt)d5m0oz@(7077zkfd)*m2kfv7phl8'
-)
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY and DEBUG:
+    SECRET_KEY = 'django-insecure-x3lg_=q&mb0^ggb&%q#kt)d5m0oz@(7077zkfd)*m2kfv7phl8'
+elif not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set and DEBUG is False.")
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
@@ -105,16 +107,25 @@ WSGI_APPLICATION = 'LocalServiceManagement.wsgi.application'
 # DATABASE
 # ======================
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'LocalServiceManagement'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'vedant2004'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+if os.getenv('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'LocalServiceManagement'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'vedant2004'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 
 # ======================
@@ -213,3 +224,5 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True') == 'True'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
