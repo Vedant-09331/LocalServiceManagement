@@ -51,9 +51,12 @@ class Service(models.Model):
     @property
     def get_display_image(self):
         if self.image:
-            return self.image.url
+            try:
+                return self.image.url
+            except Exception:
+                pass
 
-        # 2. Fallback to category-based static images
+        # Fallback to category-based static images
         mapping = {
             'cleaning': 'cleaning.jpg',
             'plumbing': 'plumbing.jpg',
@@ -71,10 +74,8 @@ class Service(models.Model):
         if file_name:
             return f"{settings.STATIC_URL}images/services/{file_name}"
             
-        # 3. Last resort: Dynamic placeholder
-        import urllib.parse
-        encoded_name = urllib.parse.quote(self.name or self.title or 'Service')
-        return f"https://placehold.co/600x400?text={encoded_name}"
+        # Last resort placeholder
+        return "https://placehold.co/600x400?text=Service"
 
     def average_rating(self):
         from django.db.models import Avg

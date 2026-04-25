@@ -57,9 +57,10 @@ class Command(BaseCommand):
         ]
 
         for sdata in services_data:
-            svc, created = Service.objects.get_or_create(
+            Service.objects.get_or_create(
                 name=sdata['name'],
                 defaults={
+                    'title': sdata['name'],
                     'vendor': vendor_user,
                     'price': sdata['price'],
                     'category': categories[sdata['category']],
@@ -68,32 +69,5 @@ class Command(BaseCommand):
                     'rating_count': 10,
                 }
             )
-            
-            # FORCE OVERWRITE with local image
-            img_filename = image_map.get(sdata['category'])
-            if img_filename:
-                # Look in possible locations
-                possible_paths = [
-                    os.path.join(settings.BASE_DIR, 'LocalServiceManagement', 'static', 'images', 'vendors', img_filename),
-                    os.path.join(settings.BASE_DIR, 'static', 'images', 'vendors', img_filename),
-                    os.path.join(settings.BASE_DIR, 'media', 'vendors', img_filename),
-                ]
-                
-                found_path = None
-                for p in possible_paths:
-                    if os.path.exists(p):
-                        found_path = p
-                        break
-                
-                if found_path:
-                    # Clean up old image if it's NOT the one we want
-                    if svc.image and not svc.image.name.endswith(img_filename):
-                        svc.image.delete(save=False)
-                    
-                    with open(found_path, 'rb') as f:
-                        svc.image.save(img_filename, File(f), save=True)
-                    self.stdout.write(self.style.SUCCESS(f"  ✓ Updated {svc.name} with local image: {img_filename}"))
-                else:
-                    self.stdout.write(self.style.WARNING(f"  ! Could not find {img_filename} locally."))
 
-        self.stdout.write(self.style.SUCCESS("\nAll services now use LOCAL images only!"))
+        self.stdout.write(self.style.SUCCESS("\nAll services seeded successfully (without images)!"))
