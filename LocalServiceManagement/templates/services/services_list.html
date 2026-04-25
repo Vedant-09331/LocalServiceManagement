@@ -60,7 +60,7 @@
       {% if service.image %}
         <img src="{{ service.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
       {% else %}
-        <img src="https://via.placeholder.com/300x200?text={{ service.name|urlencode }}" class="card-img-top" style="height:200px; object-fit:cover;">
+        <img src="https://placehold.co/600x400?text={{ service.name|urlencode }}" class="card-img-top" style="height:200px; object-fit:cover;">
       {% endif %}
 
       <div class="card-body">

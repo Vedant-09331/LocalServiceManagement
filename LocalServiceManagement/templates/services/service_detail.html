@@ -13,7 +13,7 @@
 {% if service.image %}
 <img src="{{ service.image.url }}" class="img-fluid rounded shadow service-img">
 {% else %}
-<img src="https://via.placeholder.com/600x400" class="img-fluid rounded shadow">
+<img src="https://placehold.co/600x400?text={{ service.name|urlencode }}" class="img-fluid rounded shadow">
 {% endif %}
 </div>
 

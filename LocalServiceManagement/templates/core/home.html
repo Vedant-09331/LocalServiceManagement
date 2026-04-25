@@ -148,9 +148,13 @@ Popular Services
 
 <div class="service-card">
 
-{% if service.image %}
-<img src="{{ service.image.url }}">
-{% endif %}
+            <div class="service-image">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="img-fluid" style="height:200px; width:100%; object-fit:cover;">
+                {% else %}
+                    <img src="https://placehold.co/600x400?text={{ service.name|urlencode }}" class="img-fluid" style="height:200px; width:100%; object-fit:cover;">
+                {% endif %}
+            </div>
 
 <div class="service-info">
 
