@@ -74,7 +74,8 @@ class Command(BaseCommand):
             if img_filename:
                 # Look in possible locations
                 possible_paths = [
-                    os.path.join(settings.BASE_DIR, 'LocalServiceManagement', 'media', 'vendors', img_filename),
+                    os.path.join(settings.BASE_DIR, 'LocalServiceManagement', 'static', 'images', 'vendors', img_filename),
+                    os.path.join(settings.BASE_DIR, 'static', 'images', 'vendors', img_filename),
                     os.path.join(settings.BASE_DIR, 'media', 'vendors', img_filename),
                 ]
                 

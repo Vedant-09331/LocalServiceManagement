@@ -17,41 +17,12 @@ def _file_md5(file_obj):
     return md5.hexdigest()
 
 
-def _deduplicated_upload(instance, filename, upload_dir):
-    """
-    Return a path for the uploaded image.
-    If a file with the same MD5 hash already exists anywhere inside MEDIA_ROOT,
-    reuse that path instead of saving a duplicate.
-    """
-    if not instance.image:
-        return os.path.join(upload_dir, filename)
-
-    file_hash = _file_md5(instance.image.file)
-
-    # Walk the entire media tree looking for an identical file
-    media_root = str(settings.MEDIA_ROOT)
-    for dirpath, _dirnames, filenames in os.walk(media_root):
-        for existing_name in filenames:
-            existing_path = os.path.join(dirpath, existing_name)
-            try:
-                with open(existing_path, 'rb') as f:
-                    existing_hash = hashlib.md5(f.read()).hexdigest()
-                if existing_hash == file_hash:
-                    # Return the *relative* path from MEDIA_ROOT
-                    return os.path.relpath(existing_path, media_root).replace('\\', '/')
-            except (IOError, OSError):
-                continue
-
-    # No duplicate found — save normally
-    return os.path.join(upload_dir, filename)
-
-
 def service_image_path(instance, filename):
-    return _deduplicated_upload(instance, filename, 'services/')
+    return f'services/{filename}'
 
 
 def gallery_image_path(instance, filename):
-    return _deduplicated_upload(instance, filename, 'service_gallery/')
+    return f'service_gallery/{filename}'
 
 
 class Category(models.Model):
