@@ -238,8 +238,8 @@ EMAIL_HOST_PASSWORD = 'bxkzwemvwvbjrtcj'
 # RAZORPAY
 # ======================
 
-RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'your_razorpay_key_id')
-RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'your_razorpay_key_secret')
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
 
 
 # ======================
