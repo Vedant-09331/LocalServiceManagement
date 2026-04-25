@@ -77,6 +77,40 @@ class Service(models.Model):
     def __str__(self):
         return self.title if self.title else self.name
 
+    @property
+    def get_display_image(self):
+        # 1. Try to serve the uploaded image if it exists on disk/storage
+        if self.image:
+            try:
+                # This checks if the file actually exists in storage
+                if self.image.storage.exists(self.image.name):
+                    return self.image.url
+            except Exception:
+                pass
+
+        # 2. Fallback to category-based static images
+        mapping = {
+            'cleaning': 'cleaning.jpg',
+            'plumbing': 'plumbing.jpg',
+            'electrical': 'electrical.avif',
+            'ac repair': 'ac_repair.jpg',
+            'painting': 'painting.jpg',
+            'carpentry': 'carpentry.jpg',
+            'pest control': 'pest_control.webp',
+            'beauty & spa': 'beauty_spa.webp',
+        }
+        
+        category_name = self.category.name.lower() if self.category else ''
+        file_name = mapping.get(category_name)
+        
+        if file_name:
+            return f"{settings.STATIC_URL}images/services/{file_name}"
+            
+        # 3. Last resort: Dynamic placeholder
+        import urllib.parse
+        encoded_name = urllib.parse.quote(self.name or self.title or 'Service')
+        return f"https://placehold.co/600x400?text={encoded_name}"
+
 
 class Review(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews')

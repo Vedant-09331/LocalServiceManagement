@@ -20,4 +20,14 @@ class Vendor(models.Model):
     total_earnings = models.FloatField(default=0)
 
     def __str__(self):
-        return self.user.email
+        return self.user.email
+
+    @property
+    def get_display_profile_image(self):
+        if self.profile_image:
+            try:
+                if self.profile_image.storage.exists(self.profile_image.name):
+                    return self.profile_image.url
+            except Exception:
+                pass
+        return f"{settings.STATIC_URL}images/services/default_services.jpg"

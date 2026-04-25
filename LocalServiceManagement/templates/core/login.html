@@ -1,55 +1,70 @@
 {% extends "base.html" %}
-{% block title %}Local Service Management{% endblock %}
 
-{% block hero %}
-{% endblock %}
+{% block title %}Login - LocalServices{% endblock %}
+
+{% block hero %}{% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-    <div class="glass-card">
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: var(--radius-xl);">
+            <div class="row g-0">
+                <div class="col-12 p-5">
+                    <div class="text-center mb-5">
+                        <h2 class="headline display-6 fw-bold mb-2">Welcome Back</h2>
+                        <p class="text-muted">Sign in to manage your premium services</p>
+                    </div>
 
-        <h2 class="text-center mb-1">Local Service Management</h2>
-        <p class="text-center mb-4">Sign in to your account</p>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger border-0 rounded-3 mb-4 small py-2">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-danger text-center">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+                    <form method="POST">
+                        {% csrf_token %}
 
-        <form method="POST">
-            {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase opacity-50">Email Address</label>
+                            <input type="email"
+                                   name="email"
+                                   class="form-control form-control-lg border-0 bg-light"
+                                   placeholder="name@company.com"
+                                   style="border-radius: var(--radius-md);"
+                                   required>
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Email address</label>
-                <input type="email"
-                       name="email"
-                       class="form-control"
-                       placeholder="Enter your email"
-                       required>
+                        <div class="mb-5">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label small fw-bold text-uppercase opacity-50 mb-0">Password</label>
+                                <a href="#" class="small text-decoration-none">Forgot?</a>
+                            </div>
+                            <input type="password"
+                                   name="password"
+                                   class="form-control form-control-lg border-0 bg-light"
+                                   placeholder="••••••••"
+                                   style="border-radius: var(--radius-md);"
+                                   required>
+                        </div>
+
+                        <button type="submit" class="btn-aura w-100 py-3 shadow-sm">
+                            Sign In to Aura
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-5">
+                        <p class="small text-muted">
+                            New to LocalServices? 
+                            <a href="{% url 'core:signup' %}" class="fw-bold text-primary text-decoration-none ms-1">Create Account</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-4">
-                <label class="form-label">Password</label>
-                <input type="password"
-                       name="password"
-                       class="form-control"
-                       placeholder="Enter your password"
-                       required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">
-                Sign In
-            </button>
-        </form>
-
-        <p class="text-center mt-4 mb-0">
-            Don’t have an account?
-            <a href="{% url 'core:signup' %}" class="fw-semibold text-decoration-none">
-                Create one
-            </a>
-        </p>
-
+        </div>
+        
+        <div class="text-center mt-4">
+            <p class="small text-muted opacity-50">Secure Authentication Powered by Aura</p>
+        </div>
     </div>
 </div>
 {% endblock %}

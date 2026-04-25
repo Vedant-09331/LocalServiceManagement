@@ -1,3 +1,4 @@
+{% load static %}
 <h1>My Services</h1>
 <a href="{% url 'add_service' %}">Add New Service</a>
 {% for service in services %}
@@ -5,7 +6,7 @@
     <h3>{{ service.name }}</h3>
     <p>{{ service.description }}</p>
     <p>Price: ₹{{ service.price }}</p>
-    {% if service.image %}<img src="{{ service.image.url }}" width="100">{% endif %}
+    {% if service.image %}<img src="{{ service.get_display_image }}" width="100">{% endif %}
     <a href="{% url 'edit_service' service.id %}">Edit</a>
     <a href="{% url 'delete_service' service.id %}">Delete</a>
   </div>

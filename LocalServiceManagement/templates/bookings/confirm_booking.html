@@ -42,7 +42,7 @@ Proceed to Payment
         <ul class="list-group">
             {% for review in reviews %}
                 <li class="list-group-item">
-                    <strong>{{ review.user.username }}</strong>: {{ review.comment }}
+                    <strong>{{ review.user.email }}</strong>: {{ review.comment }}
                     <span class="text-warning">{{ review.rating }} ★</span>
                 </li>
             {% endfor %}

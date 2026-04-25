@@ -2,40 +2,50 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
+from django.db import models
 
 from .models import ChatRoom, Message
 from bookings.models import Booking
 
 
-def _has_booking_with(user, provider):
-    """Check if user has any booking with the given vendor/provider."""
+def _has_confirmed_booking_between(user1, user2):
+    """Check if there is an accepted/completed booking between these two users (one user, one vendor)."""
     return Booking.objects.filter(
-        user=user,
-        vendor__user=provider,
+        status__in=['confirmed', 'completed']
+    ).filter(
+        (models.Q(user=user1) & models.Q(vendor__user=user2)) |
+        (models.Q(user=user2) & models.Q(vendor__user=user1))
     ).exists()
 
 
 @login_required
-def chat_room(request, provider_id):
+def chat_room(request, other_user_id):
     from core.models import User
-    provider = get_object_or_404(User, id=provider_id)
+    other_user = get_object_or_404(User, id=other_user_id)
 
-    # Determine who is the "user" and who is the "provider"
-    # The logged-in user could be either side
-    is_user_side = (request.user != provider)
+    # Check if there is an authorized booking to allow chat
+    if not _has_confirmed_booking_between(request.user, other_user):
+        messages.error(
+            request,
+            "You can only chat after a booking request has been accepted."
+        )
+        # Redirect based on role
+        if request.user.role == 'vendor':
+            return redirect('vendors:vendor_dashboard')
+        return redirect('core:user_dashboard')
 
-    if is_user_side:
-        # Regular user trying to chat with a vendor — check booking exists
-        if not _has_booking_with(request.user, provider):
-            messages.error(
-                request,
-                "You can only chat with a vendor after booking their service."
-            )
-            return redirect('services:services_list')
+    # Ensure consistent room creation: user side vs provider side
+    # We define room.user as the 'user' role and room.provider as the 'vendor' role
+    if request.user.role == 'user':
+        chat_user = request.user
+        chat_provider = other_user
+    else:
+        chat_user = other_user
+        chat_provider = request.user
 
     room, created = ChatRoom.objects.get_or_create(
-        user=request.user if is_user_side else provider,
-        provider=provider if is_user_side else request.user,
+        user=chat_user,
+        provider=chat_provider,
     )
 
     chat_messages = Message.objects.filter(room=room).order_by('timestamp')
@@ -43,7 +53,7 @@ def chat_room(request, provider_id):
     return render(request, 'chat/chat.html', {
         'room': room,
         'messages': chat_messages,
-        'other_user': provider if is_user_side else room.user,
+        'other_user': other_user,
     })
 
 
@@ -69,6 +79,7 @@ def send_message(request):
         )
 
         return JsonResponse({
+            'id': msg.id,
             'message': msg.message,
             'sender': msg.sender.email,
             'timestamp': msg.timestamp.strftime('%I:%M %p'),

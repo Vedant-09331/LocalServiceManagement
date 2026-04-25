@@ -1,120 +1,106 @@
-{% extends 'base.html' %}
-{% block title %}Vendor Registration | LocalServices{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Become a Vendor - LocalServices{% endblock %}
 
 {% block content %}
-<style>
-.vr-wrap {
-  max-width: 560px;
-  margin: 0 auto;
-  font-family: 'Poppins', sans-serif;
-}
-.vr-card {
-  background: white;
-  border-radius: 20px;
-  padding: 36px 40px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-}
-.vr-header {
-  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
-  border-radius: 14px;
-  padding: 22px 24px;
-  color: white;
-  text-align: center;
-  margin-bottom: 28px;
-}
-.vr-header h4 { font-weight: 700; margin: 0; font-size: 1.25rem; }
-.vr-header p  { opacity: 0.8; font-size: 0.88rem; margin: 6px 0 0; }
-.form-label { font-weight: 600; font-size: 0.88rem; color: #374151; }
-.form-control, select.form-control {
-  border-radius: 10px;
-  border: 1.5px solid #e2e8f0;
-  font-size: 0.9rem;
-  padding: 10px 14px;
-}
-.form-control:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-}
-.btn-register {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s;
-  letter-spacing: 0.3px;
-  margin-top: 8px;
-}
-.btn-register:hover { opacity: 0.88; }
-.error-text { color: #dc2626; font-size: 0.8rem; margin-top: 4px; }
-</style>
-
-<div class="vr-wrap py-4">
-
-  {% if messages %}
-    {% for msg in messages %}
-      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-3">
-        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <div class="vr-card">
-    <div class="vr-header">
-      <h4><i class="fa-solid fa-store me-2"></i>Become a Vendor</h4>
-      <p>Set up your vendor profile and start taking bookings</p>
+<div class="max-w-7xl mx-auto px-6 py-20 flex flex-col items-center">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="w-20 h-20 bg-primary-fixed text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/10">
+            <span class="material-symbols-outlined text-4xl">storefront</span>
+        </div>
+        <h1 class="font-headline-lg text-4xl text-on-surface mb-2">Become a Vendor</h1>
+        <p class="font-body-lg text-on-surface-variant max-w-lg mx-auto">Set up your professional profile and start offering your expert services to our community.</p>
     </div>
 
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="row g-3">
+    <!-- Registration Card -->
+    <div class="w-full max-w-xl bg-white rounded-3xl border border-slate-100 shadow-2xl overflow-hidden">
+        <div class="p-8 md:p-12">
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="mb-8 p-4 rounded-xl border {% if msg.tags == 'success' %}bg-green-50 border-green-100 text-green-800{% else %}bg-blue-50 border-blue-100 text-blue-800{% endif %} flex items-center gap-3">
+                    <span class="material-symbols-outlined">{% if msg.tags == 'success' %}check_circle{% else %}info{% endif %}</span>
+                    <p class="text-sm font-medium">{{ msg }}</p>
+                </div>
+                {% endfor %}
+            {% endif %}
 
-        <div class="col-12">
-          <label class="form-label">Service Category</label>
-          {{ form.service }}
-          {% if form.service.errors %}<div class="error-text">{{ form.service.errors.0 }}</div>{% endif %}
+            <form method="post" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Service Category</label>
+                        {{ form.service }}
+                        {% if form.service.errors %}<p class="text-xs text-error mt-1">{{ form.service.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Phone Number <span class="text-error">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-xl">call</span>
+                            <input type="tel" name="phone" class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" placeholder="e.g. 9876543210" value="{{ form.phone.value|default:'' }}" required>
+                        </div>
+                        {% if form.phone.errors %}<p class="text-xs text-error mt-1">{{ form.phone.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Years of Experience</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-xl">badge</span>
+                            <input type="number" name="experience" class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" placeholder="e.g. 3" min="0" value="{{ form.experience.value|default:'0' }}">
+                        </div>
+                        {% if form.experience.errors %}<p class="text-xs text-error mt-1">{{ form.experience.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Profile Picture</label>
+                        <div class="p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 text-center hover:border-primary/30 transition-colors">
+                            <input type="file" name="profile_image" class="hidden" id="profile_upload" accept="image/*">
+                            <label for="profile_upload" class="cursor-pointer">
+                                <span class="material-symbols-outlined text-outline text-3xl mb-2">cloud_upload</span>
+                                <p class="text-sm font-bold text-on-surface">Click to upload photo</p>
+                                <p class="text-[10px] text-outline mt-1 uppercase">JPG, PNG up to 5MB</p>
+                            </label>
+                        </div>
+                        {% if form.profile_image.errors %}<p class="text-xs text-error mt-1">{{ form.profile_image.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-primary text-on-primary py-5 rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3">
+                    <span class="material-symbols-outlined">rocket_launch</span>
+                    Create Vendor Profile
+                </button>
+            </form>
         </div>
-
-        <div class="col-12">
-          <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-          <input type="tel" name="phone" class="form-control"
-                 placeholder="e.g. 9876543210"
-                 value="{{ form.phone.value|default:'' }}" required>
-          {% if form.phone.errors %}<div class="error-text">{{ form.phone.errors.0 }}</div>{% endif %}
+        
+        <div class="bg-slate-50 p-6 text-center border-t border-slate-100">
+            <p class="text-sm text-on-surface-variant">
+                Already registered? <a href="{% url 'vendors:vendor_dashboard' %}" class="text-primary font-bold hover:underline">Go to Dashboard</a>
+            </p>
         </div>
-
-        <div class="col-12">
-          <label class="form-label">Years of Experience</label>
-          <input type="number" name="experience" class="form-control"
-                 placeholder="e.g. 3" min="0"
-                 value="{{ form.experience.value|default:'0' }}">
-          {% if form.experience.errors %}<div class="error-text">{{ form.experience.errors.0 }}</div>{% endif %}
-        </div>
-
-        <div class="col-12">
-          <label class="form-label">Profile Picture <span class="text-muted small">(optional)</span></label>
-          <input type="file" name="profile_image" class="form-control" accept="image/*">
-          {% if form.profile_image.errors %}<div class="error-text">{{ form.profile_image.errors.0 }}</div>{% endif %}
-        </div>
-
-        <div class="col-12 mt-2">
-          <button type="submit" class="btn-register">
-            <i class="fa-solid fa-store me-2"></i>Create Vendor Profile
-          </button>
-        </div>
-
-      </div>
-    </form>
-
-    <div class="text-center mt-3">
-      <small class="text-muted">
-        Already registered? <a href="{% url 'vendors:vendor_dashboard' %}" style="color:#3b82f6;font-weight:600;">Go to Dashboard</a>
-      </small>
     </div>
-  </div>
 </div>
+
+<style>
+    select {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background-color: white;
+        font-family: 'Manrope', sans-serif;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.5em;
+    }
+    select:focus {
+        border-color: #00327d;
+        outline: none;
+        box-shadow: 0 0 0 1px #00327d;
+    }
+</style>
 {% endblock %}

@@ -1,69 +1,70 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}My Cart{% endblock %}
+{% block title %}My Cart - Aura Professional{% endblock %}
 
 {% block hero %}{% endblock %}
 
 {% block content %}
 
-<div class="container py-4">
+<div class="container py-5">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0"><i class="fa-solid fa-cart-shopping me-2 text-primary"></i>My Cart</h2>
-    <a href="{% url 'services:services_list' %}" class="btn btn-outline-primary rounded-pill">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <h2 class="headline fw-bold mb-0"><i class="fa-solid fa-cart-shopping me-2 text-primary"></i>Your Cart</h2>
+    <a href="{% url 'services:services_list' %}" class="btn btn-outline-aura rounded-pill px-4">
       <i class="fa-solid fa-plus me-1"></i> Add More Services
     </a>
   </div>
 
   {% if items %}
 
-  <div class="row g-4">
+  <div class="row g-5">
 
     <!-- CART ITEMS -->
     <div class="col-lg-8">
       {% for item in items %}
-      <div class="cart-item-card mb-3">
+      <div class="cart-item-card mb-4 border-0">
         <div class="row g-0 align-items-center">
 
           <div class="col-md-3">
             {% if item.service.image %}
-              <img src="{{ item.service.image.url }}" class="cart-item-img">
+              <img src="{{ item.service.get_display_image }}" class="cart-item-img">
             {% else %}
               <div class="cart-item-img-placeholder">
-                <i class="fa-solid fa-wrench fa-2x text-muted"></i>
+                <i class="fa-solid fa-wrench fa-2x text-muted opacity-50"></i>
               </div>
             {% endif %}
           </div>
 
-          <div class="col-md-6">
-            <div class="p-3">
-              <span class="badge bg-primary bg-opacity-10 text-primary small mb-1">{{ item.service.category }}</span>
-              <h5 class="fw-bold mb-1">{{ item.service.name }}</h5>
-              <p class="text-muted small mb-2">{{ item.service.description|truncatewords:15 }}</p>
-              <span class="fw-bold text-primary fs-5">₹{{ item.service.price }}</span>
+          <div class="col-md-5">
+            <div class="p-4">
+              <span class="badge bg-light text-primary border border-primary-subtle small mb-2 px-3 py-2 rounded-pill">{{ item.service.category }}</span>
+              <h5 class="fw-bold mb-2">{{ item.service.name }}</h5>
+              <p class="text-muted small mb-3">{{ item.service.description|truncatewords:12 }}</p>
+              <span class="fw-bold text-primary fs-5">₹{{ item.service.price|floatformat:0 }}</span>
             </div>
           </div>
 
-          <div class="col-md-3 text-center">
-            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+          <div class="col-md-4 text-center pe-4">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
               <form method="post" action="{% url 'cart:update_quantity' item.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="decrease">
-                <button class="btn btn-sm btn-outline-secondary rounded-circle qty-btn">−</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-circle qty-btn shadow-sm">−</button>
               </form>
 
-              <span class="fw-bold fs-5 mx-2">{{ item.quantity }}</span>
+              <span class="fw-bold fs-5 mx-3">{{ item.quantity }}</span>
 
               <form method="post" action="{% url 'cart:update_quantity' item.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="increase">
-                <button class="btn btn-sm btn-outline-secondary rounded-circle qty-btn">+</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-circle qty-btn shadow-sm">+</button>
               </form>
             </div>
 
-            <p class="text-muted small mb-2">Subtotal: <strong>₹{{ item.subtotal }}</strong></p>
+            <p class="text-muted small mb-3">Subtotal: <strong class="text-dark">₹{{ item.subtotal|floatformat:0 }}</strong></p>
 
-            <a href="{% url 'cart:remove_from_cart' item.id %}" class="btn btn-sm btn-outline-danger rounded-pill">
+            <a href="{% url 'cart:remove_from_cart' item.id %}" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm">
               <i class="fa-solid fa-trash me-1"></i> Remove
             </a>
           </div>
@@ -75,33 +76,36 @@
 
     <!-- ORDER SUMMARY -->
     <div class="col-lg-4">
-      <div class="summary-card">
-        <h5 class="fw-bold mb-4"><i class="fa-solid fa-receipt me-2"></i>Order Summary</h5>
+      <div class="summary-card border-0">
+        <h5 class="fw-bold mb-4 headline"><i class="fa-solid fa-receipt me-2 text-primary"></i>Order Summary</h5>
 
-        <div class="d-flex justify-content-between mb-2">
+        <div class="d-flex justify-content-between mb-3">
           <span class="text-muted">Items ({{ cart.item_count }})</span>
-          <span>₹{{ total }}</span>
+          <span class="fw-medium">₹{{ total|floatformat:0 }}</span>
         </div>
 
-        <div class="d-flex justify-content-between mb-2">
+        <div class="d-flex justify-content-between mb-3">
           <span class="text-muted">Service Fee</span>
-          <span class="text-success">Free</span>
+          <span class="text-success fw-medium px-2 py-1 bg-success bg-opacity-10 rounded">Free</span>
         </div>
 
-        <hr>
+        <hr class="my-4 opacity-10">
 
         <div class="d-flex justify-content-between mb-4">
-          <span class="fw-bold fs-5">Total</span>
-          <span class="fw-bold fs-5 text-primary">₹{{ total }}</span>
+          <span class="fw-bold fs-5 text-dark">Total</span>
+          <span class="fw-bold fs-4 text-primary">₹{{ total|floatformat:0 }}</span>
         </div>
 
-        <a href="{% url 'cart:checkout' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
-          <i class="fa-solid fa-lock me-2"></i> Proceed to Pay
+        <a href="{% url 'cart:checkout' %}" class="btn-aura btn-lg w-100 py-3 shadow-sm">
+          <i class="fa-solid fa-lock me-2"></i> Proceed to Checkout
         </a>
 
-        <p class="text-center text-muted small mt-3 mb-0">
-          <i class="fa-solid fa-shield-halved me-1"></i> Secured by Razorpay
-        </p>
+        <div class="text-center mt-4 pt-3 border-top">
+          <p class="text-muted small mb-0 d-flex align-items-center justify-content-center gap-2">
+            <i class="fa-solid fa-shield-halved text-success"></i> 
+            <span>Secured by Aura Payments</span>
+          </p>
+        </div>
       </div>
     </div>
 
@@ -109,11 +113,13 @@
 
   {% else %}
 
-  <div class="text-center py-5">
-    <i class="fa-solid fa-cart-shopping fa-4x text-muted mb-4" style="opacity:0.2;"></i>
-    <h4 class="fw-bold">Your cart is empty</h4>
-    <p class="text-muted">Browse services and add them to your cart.</p>
-    <a href="{% url 'services:services_list' %}" class="btn btn-primary rounded-pill px-4 py-2 mt-2">
+  <div class="text-center py-5 my-5">
+    <div class="mb-4 d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 120px; height: 120px;">
+      <i class="fa-solid fa-cart-shopping fa-3x text-muted opacity-50"></i>
+    </div>
+    <h3 class="headline fw-bold mb-3">Your cart is empty</h3>
+    <p class="text-muted mb-4">Browse our premium services and add them to your cart.</p>
+    <a href="{% url 'services:services_list' %}" class="btn-aura btn-lg px-5 shadow-sm">
       Explore Services
     </a>
   </div>
@@ -121,50 +127,5 @@
   {% endif %}
 
 </div>
-
-<style>
-.cart-item-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-  transition: 0.3s;
-}
-.cart-item-card:hover {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transform: translateY(-2px);
-}
-.cart-item-img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 16px 0 0 16px;
-}
-.cart-item-img-placeholder {
-  width: 100%;
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f5f9;
-  border-radius: 16px 0 0 16px;
-}
-.qty-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-.summary-card {
-  background: white;
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-  position: sticky;
-  top: 100px;
-}
-</style>
 
 {% endblock %}

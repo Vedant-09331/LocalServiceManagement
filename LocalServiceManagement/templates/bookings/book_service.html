@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Book {{ service.name }}{% endblock %}
+{% block title %}Book {{ service.name }} - Aura Professional{% endblock %}
 
 {% block content %}
 
@@ -8,74 +9,83 @@
   <div class="row justify-content-center">
     
     <div class="col-lg-10">
-      <div class="card shadow-lg rounded-4 overflow-hidden">
-
+      <div class="card shadow-lg rounded-4 overflow-hidden border-0" style="border-radius: var(--radius-xl);">
         <div class="row g-0">
 
           <!-- LEFT IMAGE -->
-          <div class="col-md-5">
+          <div class="col-md-5 position-relative">
             {% if service.image %}
-            <img src="{{ service.image.url }}" class="img-fluid h-100 w-100 object-fit-cover">
+            <img src="{{ service.get_display_image }}" class="img-fluid h-100 w-100 object-fit-cover">
             {% else %}
-            <img src="https://placehold.co/300x200" class="img-fluid h-100 w-100 object-fit-cover">
+            <img src="https://placehold.co/300x200?text={{ service.name|urlencode }}" class="img-fluid h-100 w-100 object-fit-cover">
             {% endif %}
+            <div class="position-absolute top-0 start-0 m-3">
+              <span class="badge bg-white text-primary shadow-sm px-3 py-2 rounded-pill">{{ service.category.name }}</span>
+            </div>
           </div>
 
           <!-- RIGHT CONTENT -->
-          <div class="col-md-7 p-4 position-relative">
+          <div class="col-md-7 p-5 position-relative bg-white">
 
-            <h2 class="fw-bold">{{ service.name }}</h2>
+            <h2 class="headline display-6 fw-bold mb-4">{{ service.name }}</h2>
 
             <!-- PROFESSIONAL -->
-            <div class="d-flex align-items-center mb-3">
-              {% if professional.photo %}
-              <img src="{{ professional.photo.url }}" class="rounded-circle me-3" width="60" height="60">
+            <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3">
+              {% if professional and professional.photo %}
+              <img src="{{ professional.photo.url }}" class="rounded-circle me-3 object-fit-cover shadow-sm" width="60" height="60">
               {% else %}
-              <img src="https://placehold.co/60" class="rounded-circle me-3">
+              <div class="rounded-circle me-3 bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px;">
+                <i class="fa-solid fa-user"></i>
+              </div>
               {% endif %}
               <div>
-                <h6 class="mb-0 fw-bold">{{ professional.name }}</h6>
-                <small class="text-muted">{{ professional.experience }} yrs experience</small>
-                <div class="text-warning">
-                  ★ {{ professional.rating }}
+                <h6 class="mb-0 fw-bold">{{ professional.name|default:"Aura Professional" }}</h6>
+                <small class="text-muted">{{ professional.experience|default:"5+" }} yrs experience</small>
+                <div class="text-warning small mt-1">
+                  <i class="fa-solid fa-star"></i> <span class="fw-bold text-dark">{{ professional.rating|default:"4.9" }}</span>
                 </div>
               </div>
             </div>
 
             <!-- DESCRIPTION -->
-            <p class="text-muted">
+            <p class="text-muted small mb-4 lh-lg">
               {{ service.description|truncatechars:200 }}
             </p>
 
             <!-- PRICE -->
-            <h4 class="text-primary fw-bold mb-4">₹{{ service.price }}</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom">
+              <span class="small fw-bold text-uppercase text-muted">Service Fee</span>
+              <h4 class="text-primary fw-bold mb-0">₹{{ service.price|floatformat:0 }}</h4>
+            </div>
 
             <!-- FORM -->
             <form method="POST">
               {% csrf_token %}
 
-              <div class="row g-3 mb-3">
+              <div class="row g-4 mb-4">
 
-                <!-- ✅ DATE PICKER -->
+                <!-- DATE PICKER -->
                 <div class="col-md-6">
-                  <label class="form-label fw-bold">Select Date</label>
+                  <label class="form-label small fw-bold text-uppercase opacity-50">Select Date</label>
                   <input 
                     type="text" 
                     id="booking_date" 
                     name="booking_date"
-                    class="form-control shadow-sm rounded-3"
-                    placeholder="Select Date"
+                    class="form-control form-control-lg bg-light border-0"
+                    placeholder="Choose a date"
+                    style="border-radius: var(--radius-sm);"
                     required
                   >
                 </div>
 
                 <!-- TIME -->
                 <div class="col-md-6">
-                  <label class="form-label fw-bold">Select Time</label>
+                  <label class="form-label small fw-bold text-uppercase opacity-50">Select Time</label>
                   <input 
                     type="time" 
                     name="booking_time" 
-                    class="form-control shadow-sm rounded-3"
+                    class="form-control form-control-lg bg-light border-0"
+                    style="border-radius: var(--radius-sm);"
                     required
                   >
                 </div>
@@ -83,19 +93,20 @@
               </div>
 
               <!-- ADDRESS -->
-              <div class="mb-3">
-                <label class="form-label fw-bold">Service Address</label>
+              <div class="mb-5">
+                <label class="form-label small fw-bold text-uppercase opacity-50">Service Address</label>
                 <textarea 
                   name="address" 
-                  class="form-control rounded-3"
+                  class="form-control bg-light border-0"
                   rows="3"
-                  placeholder="Enter full address"
+                  placeholder="Enter your full address for the service..."
+                  style="border-radius: var(--radius-sm); resize: none;"
                   required></textarea>
               </div>
 
               <!-- BUTTON -->
-              <button type="submit" class="btn btn-success btn-lg w-100 shadow">
-                Confirm Booking
+              <button type="submit" class="btn-aura btn-lg w-100 shadow-sm py-3">
+                Confirm Booking Request
               </button>
 
             </form>
@@ -103,6 +114,11 @@
           </div>
         </div>
       </div>
+      
+      <div class="text-center mt-4">
+        <p class="small text-muted opacity-75"><i class="fa-solid fa-shield-halved me-1"></i> Secure booking powered by Aura Professional</p>
+      </div>
+      
     </div>
 
   </div>
@@ -110,17 +126,12 @@
 
 {% endblock %}
 
-{% block scripts %}
-<!-- Flatpickr date picker -->
+{% block extra_css %}
+<!-- Flatpickr CSS only -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block scripts %}
+<!-- Flatpickr script is loaded here, but initialized globally in main.js -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-  flatpickr("#booking_date", {
-    dateFormat: "Y-m-d",
-    altInput: true,
-    altFormat: "d-m-Y",
-    minDate: "today",
-    disableMobile: true
-  });
-</script>
 {% endblock %}

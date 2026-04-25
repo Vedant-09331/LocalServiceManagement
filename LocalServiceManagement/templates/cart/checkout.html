@@ -1,68 +1,90 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Checkout — Pay with Razorpay{% endblock %}
-
-{% block hero %}{% endblock %}
+{% block title %}Checkout - Secure Payment | LocalServices{% endblock %}
 
 {% block content %}
-
-<div class="container py-4">
-
-  <div class="row justify-content-center">
-    <div class="col-lg-7">
-
-      <div class="checkout-card">
-
-        <div class="text-center mb-4">
-          <i class="fa-solid fa-lock fa-2x text-primary mb-2"></i>
-          <h3 class="fw-bold">Secure Checkout</h3>
-          <p class="text-muted">Review your order and proceed to payment</p>
+<div class="max-w-4xl mx-auto px-6 py-20">
+    <div class="text-center mb-12">
+        <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <span class="material-symbols-outlined text-4xl">lock</span>
         </div>
-
-        <hr>
-
-        <!-- ORDER ITEMS -->
-        {% for item in items %}
-        <div class="d-flex justify-content-between align-items-center py-2">
-          <div>
-            <strong>{{ item.service.name }}</strong>
-            <span class="text-muted small ms-1">x{{ item.quantity }}</span>
-          </div>
-          <span class="fw-bold">₹{{ item.subtotal }}</span>
-        </div>
-        {% endfor %}
-
-        <hr>
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <span class="fs-5 fw-bold">Total Payable</span>
-          <span class="fs-4 fw-bold text-primary">₹{{ total }}</span>
-        </div>
-
-        <!-- RAZORPAY BUTTON -->
-        <button id="rzp-button" class="btn btn-primary w-100 py-3 fw-bold rounded-pill fs-5">
-          <i class="fa-solid fa-credit-card me-2"></i> Pay ₹{{ total }}
-        </button>
-
-        <p class="text-center text-muted small mt-3">
-          <i class="fa-solid fa-shield-halved me-1"></i> Payments are processed securely by Razorpay
-        </p>
-
-      </div>
-
+        <h1 class="font-headline-lg text-4xl text-on-surface mb-2">Secure Checkout</h1>
+        <p class="font-body-lg text-on-surface-variant">Review your order details and proceed to secure payment.</p>
     </div>
-  </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+        <!-- Order Summary -->
+        <div class="lg:col-span-3 space-y-8">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+                    <h2 class="font-headline-md text-xl text-on-surface">Order Summary</h2>
+                    <span class="text-xs font-bold text-outline uppercase tracking-widest">{{ items|length }} Items</span>
+                </div>
+                <div class="p-8 space-y-6">
+                    {% for item in items %}
+                    <div class="flex justify-between items-center group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary-fixed transition-colors">
+                                <span class="material-symbols-outlined">service_toolbox</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-on-surface leading-tight">{{ item.service.name }}</p>
+                                <p class="text-xs text-outline">Qty: {{ item.quantity }}</p>
+                            </div>
+                        </div>
+                        <p class="font-headline-md text-lg text-on-surface">₹{{ item.subtotal|floatformat:0 }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="p-8 bg-slate-50/50 border-t border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-on-surface font-medium">Total Payable</span>
+                        <span class="font-display-xl text-4xl text-primary font-bold">₹{{ total|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trusted Badges -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 rounded-2xl bg-white border border-slate-100 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-green-600">verified</span>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Encrypted Data</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-100 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-blue-600">policy</span>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Refund Policy</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Action -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-on-background text-background p-8 rounded-3xl shadow-2xl">
+                <h3 class="font-headline-md text-xl mb-6">Payment Method</h3>
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-center gap-3 p-4 rounded-xl bg-white/10 border border-white/10">
+                        <span class="material-symbols-outlined text-white/60">credit_card</span>
+                        <span class="font-bold">Cards / UPI / Netbanking</span>
+                    </div>
+                </div>
+                
+                <button id="rzp-button" class="w-full bg-primary text-on-primary py-5 rounded-2xl font-bold text-lg hover:opacity-90 transition-all flex items-center justify-center gap-3 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined">payments</span>
+                    Pay ₹{{ total|floatformat:0 }}
+                </button>
+                
+                <p class="text-center mt-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                    Powered by Razorpay
+                </p>
+            </div>
+            
+            <a href="{% url 'cart:cart_detail' %}" class="w-full text-center block text-xs font-bold text-outline hover:text-primary transition-colors uppercase tracking-widest">
+                Return to Cart
+            </a>
+        </div>
+    </div>
 </div>
-
-<style>
-.checkout-card {
-  background: white;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-}
-</style>
 
 {% endblock %}
 
@@ -77,7 +99,6 @@
     "description": "Service Booking Payment",
     "order_id": "{{ razorpay_order_id }}",
     "handler": function (response) {
-      // Submit payment details to our server
       var form = document.createElement('form');
       form.method = 'POST';
       form.action = "{% url 'cart:payment_callback' %}";
@@ -109,7 +130,7 @@
       "email": "{{ user_email }}"
     },
     "theme": {
-      "color": "#2563eb"
+      "color": "#00327d"
     }
   };
 

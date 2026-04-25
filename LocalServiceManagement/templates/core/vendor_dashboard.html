@@ -1,238 +1,223 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vendor Dashboard</title>
+{% extends "base.html" %}
+{% load static %}
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Vendor Portal - LocalServices{% endblock %}
 
-    <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: #f4f6f9;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            height: 100vh;
-            background: #111827;
-            color: white;
-            position: fixed;
-            width: 230px;
-            padding-top: 20px;
-        }
-
-        .sidebar a {
-            display: block;
-            color: #cbd5e1;
-            padding: 12px 20px;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        .sidebar a:hover {
-            background: #1f2937;
-            color: white;
-        }
-
-        .sidebar a.active {
-            background: #1f2937;
-            color: #38bdf8;
-            border-left: 3px solid #38bdf8;
-        }
-
-        /* Content */
-        .content {
-            margin-left: 240px;
-            padding: 24px;
-        }
-
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: none;
-        }
-
-        .card:hover {
-            transform: scale(1.03);
-            transition: 0.3s;
-        }
-
-        .stat-card {
-            color: white;
-        }
-
-        .badge-status {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <h4 class="text-center py-2">⚡ LSM</h4>
-    <hr class="border-secondary">
-
-    <a href="{% url 'core:vendor_dashboard' %}" class="active">
-        <i class="fa fa-home me-2"></i> Dashboard
-    </a>
-    <a href="{% url 'vendors:vendor_my_services' %}">
-        <i class="fa fa-briefcase me-2"></i> My Services
-    </a>
-    <a href="{% url 'vendors:vendor_bookings' %}">
-        <i class="fa fa-calendar me-2"></i> Bookings
-    </a>
-    <a href="{% url 'vendors:vendor_earnings' %}">
-        <i class="fa fa-wallet me-2"></i> Earnings
-    </a>
-    <a href="{% url 'vendors:vendor_profile' %}">
-        <i class="fa fa-user me-2"></i> Profile
-    </a>
-    <a href="{% url 'core:logout' %}">
-        <i class="fa fa-sign-out-alt me-2"></i> Logout
-    </a>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="content">
-
-    <!-- TOP BAR -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>👋 Welcome, {{ vendor.user.get_full_name|default:request.user.email }}</h3>
-        <span class="badge bg-success fs-6">Vendor</span>
-    </div>
-
-    <!-- STATS -->
-    <div class="row mb-4 g-3">
-
-        <div class="col-md-3">
-            <div class="card stat-card bg-primary p-3">
-                <h6><i class="fa fa-calendar-check me-1"></i> Total Bookings</h6>
-                <h3 class="mb-0">{{ total_bookings }}</h3>
+{% block content %}
+<div class="flex min-h-screen bg-background -mt-5 -mx-4 md:-mx-8">
+    <!-- Sidebar -->
+    <aside class="w-64 border-r border-slate-100 bg-white hidden lg:flex flex-col pt-8 pb-8 font-['Manrope']">
+        <nav class="flex-1 px-4 space-y-2">
+            <a class="flex items-center px-4 py-3 bg-primary-fixed text-primary rounded-xl transition-all font-bold" href="{% url 'core:vendor_dashboard' %}">
+                <span class="material-symbols-outlined mr-3">dashboard</span>
+                Portal Home
+            </a>
+            <a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-slate-50 hover:translate-x-1 rounded-xl transition-all" href="{% url 'vendors:vendor_my_services' %}">
+                <span class="material-symbols-outlined mr-3">screwdriver_wrench</span>
+                My Services
+            </a>
+            <a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-slate-50 hover:translate-x-1 rounded-xl transition-all" href="{% url 'vendors:vendor_bookings' %}">
+                <span class="material-symbols-outlined mr-3">calendar_check</span>
+                Bookings
+            </a>
+            <a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-slate-50 hover:translate-x-1 rounded-xl transition-all" href="{% url 'vendors:vendor_earnings' %}">
+                <span class="material-symbols-outlined mr-3">chart_line</span>
+                Earnings
+            </a>
+            <a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-slate-50 hover:translate-x-1 rounded-xl transition-all" href="{% url 'vendors:vendor_profile' %}">
+                <span class="material-symbols-outlined mr-3">person_edit</span>
+                Profile
+            </a>
+        </nav>
+        
+        <div class="px-4 mt-auto">
+            <div class="bg-primary/5 p-4 rounded-2xl mb-4 border border-primary/10">
+                <p class="text-[10px] text-primary font-bold uppercase tracking-widest mb-1">Vendor Tier</p>
+                <p class="text-sm font-bold text-on-surface">Premium Partner</p>
             </div>
+            <a href="{% url 'core:logout' %}" class="flex items-center px-4 py-3 text-on-surface-variant hover:text-error transition-all rounded-xl" href="#">
+                <span class="material-symbols-outlined mr-3">logout</span>
+                Logout
+            </a>
         </div>
+    </aside>
 
-        <div class="col-md-3">
-            <div class="card stat-card bg-success p-3">
-                <h6><i class="fa fa-indian-rupee-sign me-1"></i> Earnings</h6>
-                <h3 class="mb-0">₹{{ earnings }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card stat-card bg-warning p-3">
-                <h6><i class="fa fa-star me-1"></i> Rating</h6>
-                <h3 class="mb-0">{{ rating }} ⭐</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card stat-card bg-dark p-3">
-                <h6><i class="fa fa-briefcase me-1"></i> Completed Jobs</h6>
-                <h3 class="mb-0">{{ completed }}</h3>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MY SERVICES -->
-    {% if services %}
-    <div class="card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">🛠️ My Services</h5>
-            <a href="{% url 'vendors:vendor_my_services' %}" class="btn btn-sm btn-outline-primary">View All</a>
-        </div>
-        <div class="row g-3">
-            {% for service in services|slice:":3" %}
-            <div class="col-md-4">
-                <div class="border rounded-3 p-3 h-100">
-                    <h6 class="fw-bold">{{ service.title|default:service.name }}</h6>
-                    <p class="text-muted small mb-1"><i class="fa fa-tag me-1"></i>{{ service.category.name }}</p>
-                    <span class="fw-bold text-primary">₹{{ service.price }}</span>
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
+        <div class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="font-headline-lg text-headline-lg text-on-background">Vendor Dashboard</h1>
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Active</span>
+                    </div>
+                    <p class="font-body-md text-on-surface-variant">Hello, {{ vendor.user.first_name|default:request.user.email }}. Here's what's happening with your services.</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{% url 'services:add_service' %}" class="bg-primary text-on-primary px-6 py-3 rounded-xl font-body-md font-bold hover:opacity-90 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Add New Service
+                    </a>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- RECENT BOOKINGS -->
-    <div class="card p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">📅 Recent Bookings</h5>
-            <a href="{% url 'vendors:vendor_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
         </div>
 
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Customer</th>
-                    <th>Service</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-lg">calendar_month</span>
+                    <span class="text-green-600 text-xs font-bold">+12%</span>
+                </div>
+                <p class="text-label-sm text-outline uppercase tracking-wider mb-1">Total Bookings</p>
+                <h3 class="font-display-xl text-3xl text-on-surface">{{ total_bookings|default:"0" }}</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-green-600 bg-green-50 p-2 rounded-lg">payments</span>
+                    <span class="text-green-600 text-xs font-bold">+₹2.4k</span>
+                </div>
+                <p class="text-label-sm text-outline uppercase tracking-wider mb-1">Net Earnings</p>
+                <h3 class="font-display-xl text-3xl text-on-surface">₹{{ earnings|floatformat:0|default:"0" }}</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-yellow-500 bg-yellow-50 p-2 rounded-lg">star</span>
+                    <span class="text-slate-400 text-xs font-bold">4.9/5</span>
+                </div>
+                <p class="text-label-sm text-outline uppercase tracking-wider mb-1">Avg. Rating</p>
+                <h3 class="font-display-xl text-3xl text-on-surface">{{ rating|floatformat:1|default:"5.0" }}</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-purple-600 bg-purple-50 p-2 rounded-lg">task_alt</span>
+                    <span class="text-purple-600 text-xs font-bold">98%</span>
+                </div>
+                <p class="text-label-sm text-outline uppercase tracking-wider mb-1">Completed</p>
+                <h3 class="font-display-xl text-3xl text-on-surface">{{ completed|default:"0" }}</h3>
+            </div>
+        </div>
 
-            <tbody>
-                {% for booking in recent_bookings %}
-                <tr>
-                    <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
-                    <td>{{ booking.service.title|default:booking.service.name }}</td>
-                    <td>
-                        {{ booking.booking_date }}
-                        {% if booking.booking_time %} {{ booking.booking_time }}{% endif %}
-                    </td>
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Recent Bookings Table -->
+            <div class="col-span-12 lg:col-span-8">
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                        <h2 class="font-headline-md text-xl text-on-surface">Recent Bookings</h2>
+                        <a href="{% url 'vendors:vendor_bookings' %}" class="text-primary text-xs font-bold hover:underline">View All</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-body-md text-sm">
+                            <thead class="bg-slate-50/50 text-outline uppercase text-[10px] tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-4">Customer</th>
+                                    <th class="px-6 py-4">Service</th>
+                                    <th class="px-6 py-4">Schedule</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                {% for booking in recent_bookings %}
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold text-on-surface">{{ booking.user.get_full_name|default:booking.user.email }}</p>
+                                        <p class="text-[10px] text-outline">Verified Client</p>
+                                    </td>
+                                    <td class="px-6 py-4 text-on-surface-variant">{{ booking.service.name }}</td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-on-surface font-medium">{{ booking.booking_date|date:"M j" }}</p>
+                                        <p class="text-xs text-outline">{{ booking.booking_time|time:"g:i A" }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                                            {% if booking.status == 'pending' %}bg-yellow-50 text-yellow-700
+                                            {% elif booking.status == 'confirmed' %}bg-blue-50 text-blue-700
+                                            {% elif booking.status == 'completed' %}bg-green-50 text-green-700
+                                            {% else %}bg-slate-50 text-slate-700{% endif %}">
+                                            {{ booking.status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            {% if booking.status == 'pending' %}
+                                                <a href="{% url 'vendors:accept_booking' booking.id %}" class="bg-primary text-on-primary px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Accept</a>
+                                                <a href="{% url 'vendors:reject_booking' booking.id %}" class="border border-slate-200 text-on-surface-variant px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50" onclick="return confirm('Decline this booking?')">Decline</a>
+                                            {% elif booking.status == 'confirmed' %}
+                                                <a href="{% url 'vendors:complete_booking' booking.id %}" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700">Complete</a>
+                                            {% else %}
+                                                <button class="text-outline text-xs font-bold opacity-50 cursor-not-allowed">Details</button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant italic">No recent bookings found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                    <td>
-                        {% if booking.status == 'completed' %}
-                            <span class="badge bg-success badge-status">Completed</span>
-                        {% elif booking.status == 'pending' %}
-                            <span class="badge bg-warning text-dark badge-status">Pending</span>
-                        {% elif booking.status == 'confirmed' %}
-                            <span class="badge bg-primary badge-status">Confirmed</span>
-                        {% else %}
-                            <span class="badge bg-danger badge-status">Cancelled</span>
-                        {% endif %}
-                    </td>
+            <!-- Side Panels -->
+            <div class="col-span-12 lg:col-span-4 space-y-8">
+                <!-- My Services Preview -->
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-headline-md text-xl text-on-surface">Active Services</h2>
+                        <a href="{% url 'vendors:vendor_my_services' %}" class="text-primary text-xs font-bold hover:underline">Manage</a>
+                    </div>
+                    <div class="space-y-4">
+                        {% for service in services|slice:":3" %}
+                        <div class="p-4 rounded-xl border border-slate-50 bg-slate-50/30 group hover:border-primary/20 transition-all">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-on-surface leading-tight">{{ service.name }}</h3>
+                                <span class="text-primary font-bold">₹{{ service.price|floatformat:0 }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-white text-[10px] text-outline px-2 py-0.5 rounded border border-slate-100 uppercase tracking-widest font-bold">{{ service.category.name }}</span>
+                                <span class="text-[10px] text-green-600 font-bold">● Live</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-6">
+                            <p class="text-sm text-outline mb-4">You haven't listed any services yet.</p>
+                            <a href="{% url 'services:add_service' %}" class="text-primary font-bold text-sm hover:underline">+ Create Your First Service</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
-                    <td>
-                        {% if booking.status == 'pending' %}
-                            <a href="{% url 'vendors:accept_booking' booking.id %}" class="btn btn-success btn-sm">Accept</a>
-                            <a href="{% url 'vendors:reject_booking' booking.id %}"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Decline this booking?')">Decline</a>
-                        {% elif booking.status == 'confirmed' %}
-                            <a href="{% url 'vendors:complete_booking' booking.id %}" class="btn btn-primary btn-sm">Complete</a>
-                        {% else %}
-                            <span class="text-muted small">—</span>
-                        {% endif %}
-                    </td>
-                </tr>
-
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
-                        <i class="fa fa-calendar-xmark fa-2x mb-2 d-block"></i>
-                        No bookings yet
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-    </div>
-
+                <!-- Earnings Chart Preview (Static Design) -->
+                <div class="bg-surface-container-low p-6 rounded-2xl border border-slate-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-label-sm text-primary uppercase font-bold tracking-wider">Revenue Stream</h3>
+                        <span class="material-symbols-outlined text-primary text-xl">trending_up</span>
+                    </div>
+                    <div class="h-32 flex items-end gap-2 mb-6 px-2">
+                        <div class="flex-1 bg-primary/10 rounded-t-lg h-[40%]"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-lg h-[60%]"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-lg h-[45%]"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-lg h-[80%]"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t-lg h-[55%]"></div>
+                        <div class="flex-1 bg-primary/40 rounded-t-lg h-[90%]"></div>
+                        <div class="flex-1 bg-primary rounded-t-lg h-[70%]"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-outline uppercase font-bold tracking-widest">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

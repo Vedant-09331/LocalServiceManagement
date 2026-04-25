@@ -1,218 +1,154 @@
-{% extends 'base.html' %}
-{% block title %}My Profile | Vendor Portal{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile - Vendor Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/vendor_portal.css' %}">
+{% endblock %}
+
+{% block container_class %}{% endblock %}
 
 {% block content %}
-<style>
-.vp-wrap { font-family:'Poppins',sans-serif; }
-.vp-hero {
-  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
-  border-radius: 20px;
-  padding: 30px 32px;
-  color: white;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.vp-avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-.vp-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid rgba(255,255,255,0.4);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-}
-.vp-avatar-placeholder {
-  width: 100px; height: 100px; border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem;
-  border: 4px solid rgba(255,255,255,0.4);
-}
-.vp-hero-info h2 { font-weight:700; margin:0; font-size:1.5rem; }
-.vp-hero-info .sub { opacity:0.8; font-size:0.9rem; margin-top:4px; }
-.vp-badge-row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-.vp-badge {
-  font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:20px;
-  background:rgba(255,255,255,0.2);
-}
-.vp-badge.verified { background:#22c55e33; color:#86efac; }
-.vp-badge.unverified { background:#f59e0b33; color:#fde68a; }
-.vp-badge.available { background:#3b82f633; color:#93c5fd; }
-
-.vp-card {
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
-  padding: 28px 30px;
-  margin-bottom: 24px;
-}
-.vp-card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1e2a4a;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f1f5f9;
-}
-.vp-nav {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-}
-.vp-nav a {
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: none;
-  background: white;
-  color: #475569;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  transition: 0.2s;
-}
-.vp-nav a:hover, .vp-nav a.active {
-  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
-  color: white;
-}
-.form-label { font-weight:600; font-size:0.88rem; color:#374151; }
-.form-control { border-radius:10px; border:1.5px solid #e2e8f0; font-size:0.9rem; }
-.form-control:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
-.btn-save {
-  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
-  color: white; border:none; border-radius:12px;
-  padding:11px 32px; font-size:0.95rem; font-weight:600;
-  cursor:pointer; transition:0.25s; letter-spacing:0.3px;
-}
-.btn-save:hover { opacity:0.88; }
-.preview-img {
-  width:80px; height:80px; border-radius:50%; object-fit:cover;
-  border:3px solid #e2e8f0; display:none; margin-top:10px;
-}
-</style>
-
-<div class="vp-wrap">
-
-  {% if messages %}
-    {% for msg in messages %}
-      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3" role="alert">
-        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <!-- Hero -->
-  <div class="vp-hero">
-    <div class="vp-avatar-wrap">
-      {% if vendor.profile_image %}
-        <img src="{{ vendor.profile_image.url }}" class="vp-avatar" alt="Profile">
-      {% else %}
-        <div class="vp-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
-      {% endif %}
-    </div>
-    <div class="vp-hero-info">
-      <h2>{{ vendor.user.get_full_name|default:vendor.user.email }}</h2>
-      <div class="sub">{{ vendor.user.email }}</div>
-      <div class="vp-badge-row">
-        <span class="vp-badge {% if vendor.is_verified %}verified{% else %}unverified{% endif %}">
-          {% if vendor.is_verified %}<i class="fa-solid fa-circle-check me-1"></i>Verified{% else %}<i class="fa-solid fa-clock me-1"></i>Pending Verification{% endif %}
-        </span>
-        <span class="vp-badge available">
-          {% if vendor.is_available %}<i class="fa-solid fa-wifi me-1"></i>Available{% else %}<i class="fa-solid fa-ban me-1"></i>Offline{% endif %}
-        </span>
-        <span class="vp-badge">
-          <i class="fa-solid fa-briefcase me-1"></i>{{ vendor.experience }} yr{% if vendor.experience != 1 %}s{% endif %} exp
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Nav -->
-  <div class="vp-nav">
-    <a href="{% url 'vendors:vendor_dashboard' %}"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
-    <a href="{% url 'vendors:vendor_profile' %}" class="active"><i class="fa-solid fa-user-pen me-1"></i>Profile</a>
-    <a href="{% url 'vendors:vendor_my_services' %}"><i class="fa-solid fa-screwdriver-wrench me-1"></i>My Services</a>
-    <a href="{% url 'vendors:vendor_bookings' %}"><i class="fa-solid fa-calendar-check me-1"></i>Bookings</a>
-    <a href="{% url 'vendors:vendor_earnings' %}"><i class="fa-solid fa-chart-line me-1"></i>Earnings</a>
-    <a href="{% url 'vendors:vendor_reviews' %}"><i class="fa-solid fa-star me-1"></i>Reviews</a>
-  </div>
-
-  <!-- Profile Form -->
-  <div class="vp-card">
-    <div class="vp-card-title"><i class="fa-solid fa-user-pen me-2 text-primary"></i>Edit Profile</div>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="row g-3">
-
-        <div class="col-md-6">
-          <label class="form-label">First Name</label>
-          <input type="text" name="first_name" class="form-control"
-                 value="{{ vendor.user.first_name }}" placeholder="First name">
+<div class="vp-dashboard-wrapper">
+    <aside class="vp-sidebar hidden lg:flex flex-col">
+        <nav class="flex-1 pt-8 pb-8">
+            <a href="{% url 'vendors:vendor_dashboard' %}" class="vp-nav-item">
+                <span class="material-symbols-outlined vp-nav-icon">dashboard</span>
+                Portal Home
+            </a>
+            <a href="{% url 'vendors:vendor_my_services' %}" class="vp-nav-item">
+                <span class="material-symbols-outlined vp-nav-icon">construction</span>
+                My Services
+            </a>
+            <a href="{% url 'vendors:vendor_bookings' %}" class="vp-nav-item">
+                <span class="material-symbols-outlined vp-nav-icon">calendar_check</span>
+                Bookings
+            </a>
+            <a href="{% url 'vendors:vendor_earnings' %}" class="vp-nav-item">
+                <span class="material-symbols-outlined vp-nav-icon">insights</span>
+                Earnings
+            </a>
+            <a href="{% url 'vendors:vendor_profile' %}" class="vp-nav-item active">
+                <span class="material-symbols-outlined vp-nav-icon">account_circle</span>
+                Profile
+            </a>
+            <a href="{% url 'vendors:vendor_reviews' %}" class="vp-nav-item">
+                <span class="material-symbols-outlined vp-nav-icon">star</span>
+                Reviews
+            </a>
+        </nav>
+        <div class="px-6 mb-8 mt-auto">
+            <a href="{% url 'core:logout' %}" class="vp-nav-item text-red-600 hover:bg-red-50">
+                <span class="material-symbols-outlined vp-nav-icon">logout</span>
+                Logout
+            </a>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Last Name</label>
-          <input type="text" name="last_name" class="form-control"
-                 value="{{ vendor.user.last_name }}" placeholder="Last name">
-        </div>
+    </aside>
 
-        <div class="col-md-6">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" value="{{ vendor.user.email }}" disabled>
-          <div class="form-text text-muted">Email cannot be changed here.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Phone Number</label>
-          {{ form.phone }}
-          {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Experience (years)</label>
-          {{ form.experience }}
-          {% if form.experience.errors %}<div class="text-danger small">{{ form.experience.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Profile Picture</label>
-          {{ form.profile_image }}
-          {% if vendor.profile_image %}
-            <div class="mt-2">
-              <img src="{{ vendor.profile_image.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;">
-              <small class="text-muted ms-2">Current photo</small>
+    <main class="vp-main-content">
+        {% if messages %}
+            {% for msg in messages %}
+            <div class="mb-8 p-4 rounded-xl border {% if msg.tags == 'success' %}bg-green-50 border-green-100 text-green-800{% else %}bg-blue-50 border-blue-100 text-blue-800{% endif %} flex justify-between items-center shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined">{% if msg.tags == 'success' %}check_circle{% else %}info{% endif %}</span>
+                    <p class="font-body-md font-medium">{{ msg }}</p>
+                </div>
             </div>
-          {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="mb-12 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
+            <div class="relative">
+                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-primary-fixed shadow-lg">
+                    {% if vendor.profile_image %}
+                        <img src="{{ vendor.get_display_profile_image }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-outline text-5xl">person</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+                    <span class="material-symbols-outlined text-sm">verified</span>
+                </div>
+            </div>
+            <div class="text-center md:text-left">
+                <h1 class="font-headline-lg text-3xl text-on-surface mb-1">{{ vendor.user.get_full_name|default:vendor.user.email }}</h1>
+                <p class="font-body-md text-on-surface-variant mb-4">{{ vendor.user.email }}</p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                    <span class="bg-primary/5 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-primary/10">
+                        {{ vendor.experience }} Years Experience
+                    </span>
+                    <span class="{% if vendor.is_available %}bg-green-50 text-green-700 border-green-100{% else %}bg-slate-50 text-slate-700 border-slate-100{% endif %} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border">
+                        {% if vendor.is_available %}Available{% else %}Offline{% endif %}
+                    </span>
+                    {% if vendor.is_verified %}
+                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                        Verified Partner
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <div class="col-12">
-          <label class="form-label">Bio / About Me</label>
-          {{ form.bio }}
-          {% if form.bio.errors %}<div class="text-danger small">{{ form.bio.errors }}</div>{% endif %}
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-8 border-b border-slate-50">
+                <h2 class="font-headline-md text-xl text-on-surface">Profile Settings</h2>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="p-8 space-y-8">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">First Name</label>
+                        <input type="text" name="first_name" value="{{ vendor.user.first_name }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" placeholder="John">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Last Name</label>
+                        <input type="text" name="last_name" value="{{ vendor.user.last_name }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" placeholder="Doe">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Phone Number</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<p class="text-xs text-error mt-1">{{ form.phone.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Experience (Years)</label>
+                        {{ form.experience }}
+                        {% if form.experience.errors %}<p class="text-xs text-error mt-1">{{ form.experience.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Profile Picture</label>
+                    <div class="flex items-center gap-4">
+                        {{ form.profile_image }}
+                    </div>
+                    <p class="text-[10px] text-outline mt-1 italic">Recommended size: 400x400px (JPG or PNG)</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-label-sm text-outline uppercase tracking-widest font-bold">Bio / Professional Summary</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}<p class="text-xs text-error mt-1">{{ form.bio.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="p-6 bg-slate-50 rounded-2xl flex items-center gap-4">
+                    {{ form.is_available }}
+                    <label class="text-on-surface font-body-md font-medium cursor-pointer" for="{{ form.is_available.id_for_label }}">
+                        I am currently available for new bookings
+                    </label>
+                </div>
+
+                <div class="pt-6 border-t border-slate-50">
+                    <button type="submit" class="bg-primary text-on-primary px-8 py-4 rounded-xl font-bold hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined">save</span>
+                        Save Profile Changes
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <div class="col-12">
-          <div class="form-check">
-            {{ form.is_available }}
-            <label class="form-check-label fw-semibold" style="font-size:0.9rem;">
-              Mark me as Available for new bookings
-            </label>
-          </div>
-        </div>
-
-        <div class="col-12 mt-2">
-          <button type="submit" class="btn-save">
-            <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
-          </button>
-        </div>
-
-      </div>
-    </form>
-  </div>
-
+    </main>
 </div>
 {% endblock %}

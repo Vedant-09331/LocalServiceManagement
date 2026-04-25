@@ -1,189 +1,154 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Service Details{% endblock %}
+{% block title %}{{ service.name }} - LocalServices{% endblock %}
 
 {% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12 md:py-20">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-outline mb-8">
+        <a href="{% url 'core:home' %}" class="hover:text-primary transition-colors">Home</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <a href="{% url 'services:services_list' %}" class="hover:text-primary transition-colors">Services</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="text-primary">{{ service.category.name }}</span>
+    </nav>
 
-<div class="container py-5">
+    <!-- Main Service Header -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mb-24">
+        <!-- Image Section -->
+        <div class="relative group">
+            <div class="aspect-square rounded-[2rem] overflow-hidden shadow-2xl">
+                {% if service.image %}
+                    <img src="{{ service.get_display_image }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="{{ service.name }}">
+                {% else %}
+                    <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-outline text-6xl opacity-20">image</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="absolute top-6 left-6 bg-white/90 backdrop-blur rounded-full px-4 py-2 flex items-center gap-2 shadow-lg border border-slate-50">
+                <span class="material-symbols-outlined text-primary text-lg">verified</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface">Verified Expert</span>
+            </div>
+        </div>
 
-<!-- SERVICE HEADER -->
-<div class="row mb-5 align-items-center">
+        <!-- Info Section -->
+        <div class="pt-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary/10">
+                    {{ service.category.name }}
+                </span>
+                <div class="flex items-center gap-1 text-yellow-500 bg-yellow-50 px-3 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="text-[10px] font-bold text-yellow-700">{{ service.rating|floatformat:1 }}</span>
+                </div>
+            </div>
 
-<div class="col-md-6">
-{% if service.image %}
-<img src="{{ service.image.url }}" class="img-fluid rounded shadow service-img">
-{% else %}
-<img src="https://placehold.co/600x400?text={{ service.name|urlencode }}" class="img-fluid rounded shadow">
-{% endif %}
-</div>
+            <h1 class="font-headline-lg text-headline-lg text-on-background mb-6 leading-tight">{{ service.name }}</h1>
+            
+            <p class="font-body-lg text-on-surface-variant mb-10 leading-relaxed opacity-80">
+                {{ service.description }}
+            </p>
 
-<div class="col-md-6">
+            <div class="flex items-baseline gap-4 mb-12 pb-12 border-b border-slate-100">
+                <span class="text-label-sm text-outline uppercase tracking-widest font-bold">Starting from</span>
+                <h2 class="font-display-xl text-5xl text-primary font-bold">₹{{ service.price|floatformat:0 }}</h2>
+            </div>
 
-<h2 class="fw-bold">{{ service.name }}</h2>
-
-<p class="text-muted mt-3">
-{{ service.description }}
-</p>
-
-<h3 class="text-primary fw-bold">
-₹{{ service.price }}
-</h3>
-
-<!-- Rating -->
-<div class="d-flex align-items-center gap-2 mb-2">
-    <span class="fs-4 fw-bold text-warning">{{ service.rating|floatformat:1 }}</span>
-    <span class="text-warning fs-5">
-        {% for i in "12345" %}
-            {% if forloop.counter <= service.rating %}
-                ★
-            {% else %}
-                ☆
-            {% endif %}
-        {% endfor %}
-    </span>
-    <span class="text-muted fs-6">({{ service.rating_count }} review{{ service.rating_count|pluralize }})</span>
-</div>
-
-<!-- ACTION BUTTONS -->
-<div class="mt-4 d-flex gap-3 flex-wrap">
-
-<a href="{% url 'bookings:book_service' service.id %}" 
-class="btn btn-primary btn-lg px-4">
-Book Now
-</a>
-
-<a href="{% url 'cart:add_to_cart' service.id %}" 
-class="btn btn-outline-primary btn-lg px-4">
-<i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
-</a>
-
-<a href="{% url 'services:toggle_favorite' service.id %}" 
-class="btn btn-lg {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %}">
-{% if is_favorite %}
-❤️ Saved
-{% else %}
-🤍 Save
-{% endif %}
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- SERVICE HIGHLIGHTS (NEW FEATURE) -->
-<div class="row text-center mb-5">
-
-<div class="col-md-4">
-<div class="highlight-box p-4">
-<h5>⚡ Fast Service</h5>
-<p class="text-muted small">Quick and reliable service at your doorstep</p>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="highlight-box p-4">
-<h5>✅ Verified Experts</h5>
-<p class="text-muted small">Trained & background-checked professionals</p>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="highlight-box p-4">
-<h5>🔒 Secure Payment</h5>
-<p class="text-muted small">100% safe and secure transactions</p>
-</div>
-</div>
-
-</div>
-
-<!-- CUSTOMER REVIEWS -->
-<div class="mt-5">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold mb-0">Customer Reviews</h3>
-    {% if user.is_authenticated %}
-    <a href="{% url 'services:add_review' service.id %}" class="btn btn-outline-primary btn-sm">
-        <i class="fa-solid fa-pen me-1"></i> Write a Review
-    </a>
-    {% endif %}
-</div>
-
-{% for review in reviews %}
-
-<div class="card mb-3 review-card">
-
-<div class="card-body">
-
-<div class="d-flex justify-content-between align-items-start">
-    <div>
-        <strong>{{ review.user.username }}</strong>
-        <small class="text-muted ms-2">{{ review.created_at|date:"M d, Y" }}</small>
+            <!-- CTA Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <a href="{% url 'bookings:book_service' service.id %}" class="flex-1 bg-primary text-on-primary py-5 rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    Book Appointment
+                </a>
+                <a href="{% url 'cart:add_to_cart' service.id %}" class="px-8 py-5 rounded-2xl border border-slate-200 font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                    Add to Cart
+                </a>
+                <a href="{% url 'services:toggle_favorite' service.id %}" class="w-16 h-16 rounded-2xl border flex items-center justify-center transition-all shadow-sm {% if is_favorite %}bg-error/10 border-error/20 text-error{% else %}bg-white border-slate-200 text-outline hover:border-error/20 hover:text-error{% endif %}">
+                    <span class="material-symbols-outlined" {% if is_favorite %}style="font-variation-settings: 'FILL' 1;"{% endif %}>favorite</span>
+                </a>
+            </div>
+            
+            <p class="text-center sm:text-left text-[10px] text-outline uppercase tracking-widest font-bold">
+                <span class="text-green-600">●</span> Instant Confirmation & No Cancellation Fee
+            </p>
+        </div>
     </div>
-    <span class="text-warning fs-6">
-        {% for i in "12345" %}
-            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
-        {% endfor %}
-        <span class="text-muted ms-1 small">{{ review.rating }}/5</span>
-    </span>
+
+    <!-- Highlights Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div class="bg-surface-container-low p-8 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
+            <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 text-primary">
+                <span class="material-symbols-outlined text-3xl">electric_bolt</span>
+            </div>
+            <h3 class="font-headline-md text-xl text-on-surface mb-3">On-Demand</h3>
+            <p class="font-body-md text-on-surface-variant opacity-70">Experience lightning-fast service right at your doorstep.</p>
+        </div>
+        <div class="bg-surface-container-low p-8 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
+            <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 text-primary">
+                <span class="material-symbols-outlined text-3xl">verified_user</span>
+            </div>
+            <h3 class="font-headline-md text-xl text-on-surface mb-3">Vetted Pros</h3>
+            <p class="font-body-md text-on-surface-variant opacity-70">Highly trained and background-checked professionals.</p>
+        </div>
+        <div class="bg-surface-container-low p-8 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
+            <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 text-primary">
+                <span class="material-symbols-outlined text-3xl">shield_check</span>
+            </div>
+            <h3 class="font-headline-md text-xl text-on-surface mb-3">Secure Pay</h3>
+            <p class="font-body-md text-on-surface-variant opacity-70">100% safe, transparent, and encrypted transactions.</p>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="border-t border-slate-100 pt-24">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+            <div>
+                <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Customer Feedback</h2>
+                <p class="font-body-lg text-on-surface-variant opacity-70">Real stories from real customers in your neighborhood.</p>
+            </div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'services:add_review' service.id %}" class="bg-on-background text-background px-8 py-4 rounded-xl font-bold hover:opacity-90 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-xl">rate_review</span>
+                Write a Review
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for review in reviews %}
+            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-primary-fixed text-primary rounded-full flex items-center justify-center font-bold text-xl uppercase">
+                            {{ review.user.email|first }}
+                        </div>
+                        <div>
+                            <p class="font-headline-md text-lg text-on-surface leading-tight">{{ review.user.email }}</p>
+                            <p class="text-xs text-outline">{{ review.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 text-yellow-500">
+                        {% for i in "12345" %}
+                            <span class="material-symbols-outlined text-sm" {% if forloop.counter <= review.rating %}style="font-variation-settings: 'FILL' 1;"{% endif %}>star</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <p class="font-body-md text-on-surface-variant leading-relaxed italic opacity-80">"{{ review.comment }}"</p>
+            </div>
+            {% empty %}
+            <div class="col-span-full py-20 text-center bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
+                <span class="material-symbols-outlined text-outline text-5xl mb-4 opacity-20">reviews</span>
+                <h3 class="font-headline-md text-2xl text-on-surface mb-2">No reviews yet</h3>
+                <p class="text-on-surface-variant font-body-md max-w-sm mx-auto mb-8">Be the first to share your experience with this professional service!</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'services:add_review' service.id %}" class="text-primary font-bold hover:underline uppercase text-xs tracking-widest">Post a Review</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-
-<p class="text-muted mt-2 mb-0">
-{{ review.comment }}
-</p>
-
-</div>
-
-</div>
-
-{% empty %}
-
-<div class="text-center text-muted py-4">
-<h5>No reviews yet 😕</h5>
-<p>Be the first to review this service!</p>
-{% if user.is_authenticated %}
-<a href="{% url 'services:add_review' service.id %}" class="btn btn-primary mt-2">Write a Review</a>
-{% endif %}
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-<!-- CUSTOM STYLES -->
-<style>
-
-.service-img{
-transition:0.3s;
-}
-.service-img:hover{
-transform:scale(1.05);
-}
-
-/* Highlight Section */
-.highlight-box{
-border-radius:12px;
-background:#f8f9fa;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
-transition:0.3s;
-}
-.highlight-box:hover{
-transform:translateY(-5px);
-}
-
-/* Review Cards */
-.review-card{
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
-transition:0.3s;
-}
-.review-card:hover{
-transform:scale(1.01);
-}
-
-</style>
-
 {% endblock %}

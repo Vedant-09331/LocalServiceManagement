@@ -1,473 +1,185 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block content %}
+{% block title %}Local Services - Premium Home Care{% endblock %}
 
-<!-- HERO SECTION -->
-
-<section class="hero">
-
-<div class="hero-overlay"></div>
-
-<div class="container hero-content">
-
-<div class="row align-items-center">
-
-<div class="col-md-6">
-
-<h1 class="hero-title">
-Premium Home Services <br>
-<span>At Your Doorstep</span>
-</h1>
-
-<p class="hero-subtitle">
-Book trusted professionals for cleaning, repair, beauty and more in seconds.
-</p>
-
-<form method="get" action="{% url 'services:services_list' %}" class="hero-search">
-
-<div class="input-group">
-
-<input type="text" name="q" class="form-control" placeholder="Search for services...">
-
-<button class="btn hero-btn">
-Search
-</button>
-
-</div>
-
-</form>
-
-<a href="{% url 'services:services_list' %}" class="btn btn-outline-light explore-btn">
-Explore Services
-</a>
-
-</div>
-
-<div class="col-md-6 text-center">
-
-<div class="hero-illustration">
-  <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
-    <!-- Background Circle -->
-    <circle cx="250" cy="200" r="170" fill="rgba(255,255,255,0.1)"/>
-    <circle cx="250" cy="200" r="130" fill="rgba(255,255,255,0.08)"/>
-
-    <!-- House -->
-    <polygon points="250,60 130,150 370,150" fill="#ffe082" stroke="white" stroke-width="2"/>
-    <rect x="160" y="150" width="180" height="130" rx="5" fill="white" opacity="0.95"/>
-    <rect x="175" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
-    <rect x="275" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
-    <rect x="220" y="220" width="60" height="60" rx="3" fill="#a5d6a7"/>
-    <circle cx="270" cy="250" r="4" fill="#666"/>
-
-    <!-- Chimney -->
-    <rect x="300" y="80" width="25" height="70" rx="3" fill="#bcaaa4"/>
-
-    <!-- Worker -->
-    <circle cx="110" cy="260" r="22" fill="#ffcc80"/>
-    <rect x="90" y="282" width="40" height="55" rx="5" fill="#42a5f5"/>
-    <rect x="85" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
-    <rect x="115" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
-    <!-- Hard Hat -->
-    <ellipse cx="110" cy="242" rx="26" ry="10" fill="#fdd835"/>
-    <rect x="96" y="235" width="28" height="8" rx="2" fill="#f9a825"/>
-    <!-- Wrench -->
-    <line x1="130" y1="295" x2="160" y2="270" stroke="#78909c" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="163" cy="267" r="8" fill="none" stroke="#78909c" stroke-width="3"/>
-
-    <!-- Sparkles -->
-    <text x="370" y="120" font-size="28" fill="#ffe082" opacity="0.9">✨</text>
-    <text x="90" y="130" font-size="22" fill="#ffe082" opacity="0.7">⭐</text>
-    <text x="390" y="250" font-size="20" fill="white" opacity="0.6">✦</text>
-
-    <!-- Tools -->
-    <rect x="370" y="290" width="60" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
-    <text x="380" y="308" font-size="12" fill="white" font-weight="600">🔧🔨🪛</text>
-  </svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- STATS SECTION -->
-
-<section class="stats">
-
-<div class="container">
-
-<div class="row text-center">
-
-<div class="col-md-3">
-<h2>500+</h2>
-<p>Professionals</p>
-</div>
-
-<div class="col-md-3">
-<h2>1200+</h2>
-<p>Happy Customers</p>
-</div>
-
-<div class="col-md-3">
-<h2>50+</h2>
-<p>Services</p>
-</div>
-
-<div class="col-md-3">
-<h2>4.8⭐</h2>
-<p>Average Rating</p>
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- SERVICES SECTION -->
-
-<section class="services-section">
-
-<div class="container">
-
-<h2 class="section-title">
-Popular Services
-</h2>
-
-<div class="row g-4">
-
-{% for service in services %}
-
-<div class="col-md-3">
-
-<div class="service-card">
-
-            <div class="service-image">
-                {% if service.image %}
-                    <img src="{{ service.image.url }}" class="img-fluid" style="height:200px; width:100%; object-fit:cover;">
-                {% else %}
-                    <img src="https://placehold.co/600x400?text={{ service.name|urlencode }}" class="img-fluid" style="height:200px; width:100%; object-fit:cover;">
-                {% endif %}
+{% block hero %}
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-24 md:pt-24 md:pb-32 bg-background">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-16">
+        <div class="flex-1 space-y-8 z-10">
+            <div class="inline-flex items-center gap-2 bg-primary-fixed px-4 py-2 rounded-full">
+                <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+                <span class="text-label-sm text-on-primary-fixed uppercase tracking-wider">Trusted by 2M+ Households</span>
             </div>
+            <h1 class="font-display-xl text-display-xl text-on-background max-w-xl">
+                Simple way to hire with <span class="italic text-primary font-headline-lg">confidence.</span>
+            </h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                Expert help for your home is just a few clicks away. From cleaning to complex repairs, we connect you with vetted local professionals.
+            </p>
+            
+            <!-- Hero Search Component -->
+            <div class="bg-white p-2 rounded-2xl shadow-xl border border-outline-variant flex flex-col md:flex-row gap-2 max-w-2xl">
+                <form method="get" action="{% url 'services:services_list' %}" class="flex-1 flex flex-col md:flex-row gap-2">
+                    <div class="flex-1 flex items-center px-4 py-3 gap-3 border-b md:border-b-0 md:border-r border-outline-variant">
+                        <span class="material-symbols-outlined text-outline">search</span>
+                        <input name="q" class="w-full border-none focus:ring-0 font-body-md text-on-surface p-0 placeholder:text-outline bg-transparent" placeholder="What service do you need?" type="text" />
+                    </div>
+                    <button type="submit" class="bg-primary text-on-primary px-8 py-4 rounded-xl font-body-md font-bold hover:opacity-95 transition-all">Search</button>
+                </form>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 pt-4">
+                <span class="text-label-sm text-outline uppercase tracking-wider">Popular:</span>
+                <a class="text-label-sm text-primary hover:underline" href="{% url 'services:services_list' %}?q=Cleaning">Home Cleaning</a>
+                <a class="text-label-sm text-primary hover:underline" href="{% url 'services:services_list' %}?q=Mounting">TV Mounting</a>
+                <a class="text-label-sm text-primary hover:underline" href="{% url 'services:services_list' %}?q=Plumbing">Plumbing</a>
+            </div>
+        </div>
+        
+        <div class="flex-1 relative">
+            <div class="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                <img alt="Professional cleaner working" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwFSu6eVOl3TxBfi17z-BmsPVlzG72CkIMHGlUwLDBwNSmFZgIzVMbVN8PLCRwg9NrQT7EiH76zxZxoPavISgto2qEDGRf7h4YNGI83mVbr0kwyF9O4pNypE-6uVvVjgydaOIHFnCQD-Zd0MnzCCFDaXKI9Os36nURjkrLCtVrKqpEVT9EGgIylSdsZmCfN--FOQC3fDi_Z3AwuPU-NIONpmgrV63w3L31zjnys7AMzlZD2hf5fjon19MXpduwnbDC-T6vw8qB8GAZ" />
+            </div>
+            <!-- Floating Badge -->
+            <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-lg border border-outline-variant backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary">person_check</span>
+                    </div>
+                    <div>
+                        <p class="text-label-sm text-outline uppercase">Vetted Providers</p>
+                        <p class="font-headline-md text-[20px] text-on-surface">Background checked</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
-<div class="service-info">
-
-<h5>{{ service.title }}</h5>
-
-<p>{{ service.description|truncatewords:12 }}</p>
-
-<span class="price">₹{{ service.price }}</span>
-
-<div class="d-flex justify-content-center gap-2 mt-2">
-<a href="{% url 'services:service_detail' service.id %}" class="btn view-btn">
-View Service
-</a>
-{% if user.is_authenticated %}
-<a href="{% url 'cart:add_to_cart' service.id %}" class="btn btn-primary btn-sm" style="border-radius:25px;">
-<i class="fa-solid fa-cart-plus"></i>
-</a>
-{% endif %}
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-{% empty %}
-
-<div class="col-12 text-center">
-<h4>No services available</h4>
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
+{% block content %}
+<!-- Popular Projects Grid -->
+<section class="py-section-padding bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-end mb-12">
+            <div>
+                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">Featured Services</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Standard services tailored for your immediate needs.</p>
+            </div>
+            <a href="{% url 'services:services_list' %}" class="text-primary font-medium flex items-center gap-2 group">
+                View all services
+                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+            {% for service in services %}
+            <div class="group bg-white rounded-xl border border-outline-variant overflow-hidden hover:shadow-xl transition-all">
+                <div class="h-48 overflow-hidden relative">
+                    <img alt="{{ service.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ service.get_display_image }}" />
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-white/90 backdrop-blur text-primary px-3 py-1 rounded-full text-label-sm font-bold shadow-sm">₹{{ service.price|floatformat:0 }}</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-label-sm text-primary uppercase tracking-wider font-bold">{{ service.category.name }}</span>
+                        <div class="flex items-center gap-1 text-yellow-500">
+                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="text-on-surface font-bold text-sm">{{ service.rating }}</span>
+                        </div>
+                    </div>
+                    <h3 class="font-headline-md text-[20px] text-on-surface mb-2 leading-tight">{{ service.name }}</h3>
+                    <p class="text-body-md text-on-surface-variant mb-6 line-clamp-2 text-sm">{{ service.description }}</p>
+                    <a href="{% url 'services:service_detail' service.id %}" class="block w-full text-center border border-primary text-primary py-3 rounded-lg font-medium group-hover:bg-primary group-hover:text-on-primary transition-colors">Book Now</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <p class="text-on-surface-variant font-body-lg">No services found. <a href="{% url 'services:services_list' %}" class="text-primary hover:underline">Browse all services</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 
-
-<!-- FEATURES -->
-
-<section class="features">
-
-<div class="container">
-
-<h2 class="section-title">
-Why Choose Us
-</h2>
-
-<div class="row text-center">
-
-<div class="col-md-4">
-
-<div class="feature-card">
-
-<i class="fa-solid fa-user-check"></i>
-
-<h5>Verified Professionals</h5>
-
-<p>All professionals are background checked and trained.</p>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="feature-card">
-
-<i class="fa-solid fa-clock"></i>
-
-<h5>On Time Service</h5>
-
-<p>Fast booking and quick arrival at your home.</p>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="feature-card">
-
-<i class="fa-solid fa-star"></i>
-
-<h5>Top Rated</h5>
-
-<p>Thousands of satisfied customers with great reviews.</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+<!-- Stats Section -->
+<section class="py-section-padding bg-surface-container-high">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+            <div>
+                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">
+                    Connecting you with <span class="font-headline-lg italic text-primary">trusted</span> local experts.
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant mb-12">
+                    Every service provider on our platform undergoes a rigorous vetting process including identity verification and background checks. We prioritize quality so you can focus on what matters.
+                </p>
+                <div class="grid grid-cols-2 gap-8 text-center md:text-left">
+                    <div>
+                        <h4 class="font-display-xl text-[48px] text-primary mb-2">700K+</h4>
+                        <p class="text-label-sm text-outline uppercase tracking-wider">Home Repairs</p>
+                    </div>
+                    <div>
+                        <h4 class="font-display-xl text-[48px] text-primary mb-2">1.5M+</h4>
+                        <p class="text-label-sm text-outline uppercase tracking-wider">Moving Tasks</p>
+                    </div>
+                    <div>
+                        <h4 class="font-display-xl text-[48px] text-primary mb-2">98%</h4>
+                        <p class="text-label-sm text-outline uppercase tracking-wider">Satisfaction</p>
+                    </div>
+                    <div>
+                        <h4 class="font-display-xl text-[48px] text-primary mb-2">24/7</h4>
+                        <p class="text-label-sm text-outline uppercase tracking-wider">Support</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="pt-12">
+                    <div class="rounded-2xl overflow-hidden shadow-lg mb-4">
+                        <img alt="Plumber working" class="w-full aspect-[4/5] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAKPdXF2kBGLtB6psanmm5qbEHcOqWiWPD8KZy1zGc0XA7dS5nxxUiUB3Z7D-IUynZq4KcKy_HtnZXINUxBYBB3sNihwCaNZECWzDATS5_Jmd_NnHDRCyf5Sc4XXFcN-jwYRp7fYYk_tuLPPWGeAl5n4lM4zkD6dBLJ7iGOz773-65KgF-zIOY3VDoh8Puk8o6kKve9-gp-YyWKfS7zSn0125l2Y4E0bwyzUf5zGF1MzfqTJM1E4FeZbBxJW6--7r6dPXVXxtBHlMY" />
+                    </div>
+                    <div class="bg-primary p-6 rounded-2xl text-on-primary shadow-lg">
+                        <span class="material-symbols-outlined text-[32px] mb-4">security</span>
+                        <p class="font-headline-md text-[18px]">Happiness Guaranteed</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white p-6 rounded-2xl mb-4 border border-outline-variant shadow-md">
+                        <span class="material-symbols-outlined text-primary text-[32px] mb-4">verified_user</span>
+                        <p class="font-headline-md text-[18px] text-on-surface">Vetted & Insured</p>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden shadow-lg">
+                        <img alt="House cleaning" class="w-full aspect-[4/5] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaNS56ypKTu4pDlc8JJgCRkCgoDTPKBop8-W77nRlhTtckexDNmA-DoTvpbwxGIcZ0D8ucI8mzil6N6aaj_bwbpe22oanUFI-ijaiBfffEFF-IXI6TMuP_IwNswLpks-RCfMlg17V7Ju_GvBNCBH0OGHWWqc7ESBgHRL8JJoG1B0kxIoY2cvACgwoBSfsytsePY40hWTYdWmkZ9SeoIeblBrLTNsaBNnqXhMC9BmRr9CiVPi-9dM60YowHB8zPOEQXbiNc3XRKEIuD" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-
-<!-- CTA -->
-
-<section class="cta">
-
-<div class="container text-center">
-
-<h2>Need a service today?</h2>
-
-<p>Book trusted professionals in seconds.</p>
-
-<a href="{% url 'services:services_list' %}" class="btn cta-btn">
-Browse Services
-</a>
-
-</div>
-
+<!-- Final CTA Section -->
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="bg-primary rounded-3xl overflow-hidden relative shadow-2xl">
+            <div class="flex flex-col md:flex-row">
+                <div class="flex-1 p-12 md:p-20 z-10">
+                    <h2 class="font-display-xl text-display-xl text-on-primary mb-6">Ready to get things done?</h2>
+                    <p class="font-body-lg text-body-lg text-on-primary-container mb-12 max-w-md opacity-90">
+                        Whether you're looking for help or looking to provide it, LocalServices is the place to start.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="{% url 'services:services_list' %}" class="bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-surface-container transition-all text-center">Find a service</a>
+                        <a href="{% url 'vendors:vendor_register' %}" class="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition-all text-center">Become a provider</a>
+                    </div>
+                </div>
+                <div class="flex-1 min-h-[300px] relative">
+                    <img alt="People shaking hands" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7Kgss0_LaT--qkwtjhc_DxQiu4bgfVkPlQDOUopaMXfmhvPRyghDYEUeWkBQNBsW8kUIS-5WQYq6pNfDw_LzJfeDG_nKtX0bdVhNkdkP40x0GX3_ydrGLsU356lJUTv7vGeIll2jlyFxwpxo6xqVW4oJ5elk6QGJQ9WpGxvrqT1LAus2MI6kh9sv0fZD10D_V-tMLRhWpsN-3fwRcpGBiAzdMf_eVIraw8FIWzeVLbrmhFzp3emj8XrKr35e6ELX3-4CwmKxF4oKu" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent md:block hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
-
-
-<style>
-
-/* HERO */
-
-.hero{
-position:relative;
-background: linear-gradient(135deg,#4e73df,#1cc88a,#36b9cc);
-padding:120px 0;
-color:white;
-overflow:hidden;
-}
-
-.hero-overlay{
-position:absolute;
-width:500px;
-height:500px;
-background:rgba(255,255,255,0.1);
-filter:blur(100px);
-border-radius:50%;
-top:-150px;
-right:-150px;
-}
-
-.hero-title{
-font-size:55px;
-font-weight:700;
-}
-
-.hero-title span{
-color:#ffe082;
-}
-
-.hero-subtitle{
-font-size:18px;
-margin-top:15px;
-opacity:0.9;
-}
-
-.hero-search{
-margin-top:30px;
-}
-
-.hero-search input{
-height:55px;
-border-radius:10px 0 0 10px;
-}
-
-.hero-btn{
-background:white;
-color:#4e73df;
-font-weight:600;
-border-radius:0 10px 10px 0;
-}
-
-.hero-btn:hover{
-background:#f8f9fa;
-}
-
-.explore-btn{
-margin-top:15px;
-border-radius:30px;
-}
-
-.hero-illustration{
-max-width:100%;
-animation: float 5s ease-in-out infinite;
-}
-
-
-/* FLOAT ANIMATION */
-
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-20px)}
-100%{transform:translateY(0)}
-}
-
-
-/* STATS */
-
-.stats{
-background:#f8f9fc;
-padding:60px 0;
-}
-
-.stats h2{
-font-size:40px;
-font-weight:700;
-color:#4e73df;
-}
-
-
-/* SERVICES */
-
-.services-section{
-padding:80px 0;
-}
-
-.section-title{
-text-align:center;
-font-weight:700;
-margin-bottom:50px;
-}
-
-.service-card{
-background:white;
-border-radius:15px;
-overflow:hidden;
-box-shadow:0 10px 30px rgba(0,0,0,0.1);
-transition:0.4s;
-}
-
-.service-card:hover{
-transform:translateY(-10px);
-box-shadow:0 20px 40px rgba(0,0,0,0.15);
-}
-
-.service-card img{
-width:100%;
-height:180px;
-object-fit:cover;
-}
-
-.service-info{
-padding:20px;
-text-align:center;
-}
-
-.price{
-display:block;
-font-weight:700;
-color:#4e73df;
-margin:10px 0;
-}
-
-.view-btn{
-border:1px solid #4e73df;
-color:#4e73df;
-border-radius:25px;
-}
-
-.view-btn:hover{
-background:#4e73df;
-color:white;
-}
-
-
-/* FEATURES */
-
-.features{
-background:#f8f9fc;
-padding:80px 0;
-}
-
-.feature-card{
-background:white;
-padding:30px;
-border-radius:15px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-transition:0.3s;
-}
-
-.feature-card:hover{
-transform:translateY(-8px);
-}
-
-.feature-card i{
-font-size:40px;
-color:#4e73df;
-margin-bottom:15px;
-}
-
-
-/* CTA */
-
-.cta{
-background: linear-gradient(135deg,#1cc88a,#4e73df);
-padding:80px 0;
-color:white;
-}
-
-.cta-btn{
-background:white;
-color:#4e73df;
-border-radius:30px;
-font-weight:600;
-}
-
-.cta-btn:hover{
-background:#f8f9fa;
-}
-
-</style>
-
 {% endblock %}

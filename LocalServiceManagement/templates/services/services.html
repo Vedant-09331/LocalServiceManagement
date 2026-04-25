@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Services{% endblock %}
 
@@ -90,7 +91,7 @@ Apply
 <div class="card service-card h-100 shadow-sm">
 
 {% if service.image %}
-<img src="{{ service.image.url }}" class="card-img-top">
+<img src="{{ service.get_display_image }}" class="card-img-top">
 {% else %}
 <img src="https://via.placeholder.com/600x400" class="card-img-top">
 {% endif %}
