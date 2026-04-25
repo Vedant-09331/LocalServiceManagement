@@ -17,5 +17,3 @@ python manage.py collectstatic --no-input
 # Apply any outstanding database migrations
 python manage.py migrate
 
-# Seed data and images (using get_or_create to avoid duplicates)
-python manage.py seed_data
