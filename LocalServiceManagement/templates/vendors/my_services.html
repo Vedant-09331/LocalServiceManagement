@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}My Services | Vendor Portal{% endblock %}
+
+{% block content %}
+<style>
+.vs-wrap { font-family:'Poppins',sans-serif; }
+.vs-topbar {
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color:white; padding:20px 28px; border-radius:18px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px;
+  box-shadow:0 8px 30px rgba(45,58,95,0.3);
+}
+.vs-topbar h4 { font-weight:700; margin:0; font-size:1.2rem; }
+.btn-add-svc {
+  background:rgba(255,255,255,0.18); color:white; border:2px solid rgba(255,255,255,0.35);
+  border-radius:10px; padding:8px 20px; font-size:0.85rem; font-weight:600;
+  text-decoration:none; transition:0.2s;
+}
+.btn-add-svc:hover { background:rgba(255,255,255,0.28); color:white; }
+.vs-nav {
+  display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;
+}
+.vs-nav a {
+  padding:8px 18px; border-radius:10px; font-size:0.85rem; font-weight:600;
+  text-decoration:none; background:white; color:#475569;
+  box-shadow:0 2px 8px rgba(0,0,0,0.07); transition:0.2s;
+}
+.vs-nav a:hover, .vs-nav a.active {
+  background:linear-gradient(135deg,#2d3a5f,#3b4f83); color:white;
+}
+.svc-card {
+  background:white; border-radius:16px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.08); overflow:hidden;
+  transition:transform 0.25s, box-shadow 0.25s;
+  height:100%;
+}
+.svc-card:hover { transform:translateY(-4px); box-shadow:0 12px 30px rgba(0,0,0,0.13); }
+.svc-card-img {
+  width:100%; height:170px; object-fit:cover;
+  background:linear-gradient(135deg,#e0e7ff,#f3f4f6);
+}
+.svc-card-img-ph {
+  width:100%; height:170px;
+  background:linear-gradient(135deg,#dbeafe,#ede9fe);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem; color:#94a3b8;
+}
+.svc-card-body { padding:18px; }
+.svc-title { font-weight:700; font-size:1rem; color:#1e293b; margin-bottom:4px; }
+.svc-meta { font-size:0.8rem; color:#64748b; margin-bottom:8px; }
+.svc-price { font-weight:700; color:#2563eb; font-size:1.05rem; }
+.svc-rating { font-size:0.8rem; color:#f59e0b; font-weight:600; }
+.svc-actions { display:flex; gap:8px; margin-top:14px; }
+.btn-edit-svc {
+  flex:1; padding:7px 0; border-radius:8px;
+  background:linear-gradient(135deg,#2563eb,#3b82f6); color:white;
+  font-size:0.8rem; font-weight:600; text-decoration:none;
+  text-align:center; transition:0.2s;
+}
+.btn-edit-svc:hover { opacity:0.88; color:white; }
+.btn-del-svc {
+  flex:1; padding:7px 0; border-radius:8px;
+  background:linear-gradient(135deg,#dc2626,#ef4444); color:white;
+  font-size:0.8rem; font-weight:600; text-decoration:none;
+  text-align:center; transition:0.2s; cursor:pointer; border:none;
+}
+.btn-del-svc:hover { opacity:0.88; }
+.empty-state {
+  text-align:center; padding:60px 20px; color:#94a3b8;
+  background:white; border-radius:18px; box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+.empty-state i { font-size:3rem; margin-bottom:16px; display:block; }
+</style>
+
+<div class="vs-wrap">
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Top bar -->
+  <div class="vs-topbar">
+    <h4><i class="fa-solid fa-screwdriver-wrench me-2"></i>My Services</h4>
+    <a href="{% url 'services:add_service' %}" class="btn-add-svc">
+      <i class="fa-solid fa-plus me-1"></i>Add New Service
+    </a>
+  </div>
+
+  <!-- Nav -->
+  <div class="vs-nav">
+    <a href="{% url 'vendors:vendor_dashboard' %}"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
+    <a href="{% url 'vendors:vendor_profile' %}"><i class="fa-solid fa-user-pen me-1"></i>Profile</a>
+    <a href="{% url 'vendors:vendor_my_services' %}" class="active"><i class="fa-solid fa-screwdriver-wrench me-1"></i>My Services</a>
+    <a href="{% url 'vendors:vendor_bookings' %}"><i class="fa-solid fa-calendar-check me-1"></i>Bookings</a>
+    <a href="{% url 'vendors:vendor_earnings' %}"><i class="fa-solid fa-chart-line me-1"></i>Earnings</a>
+    <a href="{% url 'vendors:vendor_reviews' %}"><i class="fa-solid fa-star me-1"></i>Reviews</a>
+  </div>
+
+  {% if services %}
+  <div class="row g-3">
+    {% for service in services %}
+    <div class="col-sm-6 col-lg-4">
+      <div class="svc-card">
+        {% if service.image %}
+          <img src="{{ service.image.url }}" class="svc-card-img" alt="{{ service.title }}">
+        {% else %}
+          <div class="svc-card-img-ph"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        {% endif %}
+        <div class="svc-card-body">
+          <div class="svc-title">{{ service.title|default:service.name }}</div>
+          <div class="svc-meta">
+            <i class="fa-solid fa-tag me-1"></i>{{ service.category.name }}
+          </div>
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <span class="svc-price">₹{{ service.price }}</span>
+            <span class="svc-rating">
+              <i class="fa-solid fa-star"></i> {{ service.rating|floatformat:1 }}
+              <span class="text-muted">({{ service.rating_count }})</span>
+            </span>
+          </div>
+          <p style="font-size:0.82rem;color:#64748b;margin:0 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+            {{ service.description }}
+          </p>
+          <div class="svc-actions">
+            <a href="{% url 'services:edit_service' service.id %}" class="btn-edit-svc">
+              <i class="fa-solid fa-pen me-1"></i>Edit
+            </a>
+            <form method="post" action="{% url 'services:delete_service' service.id %}" style="flex:1" onsubmit="return confirm('Delete this service?')">
+              {% csrf_token %}
+              <button type="submit" class="btn-del-svc w-100">
+                <i class="fa-solid fa-trash me-1"></i>Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-screwdriver-wrench"></i>
+    <h5 style="color:#475569;font-weight:700;">No services yet</h5>
+    <p>Start by adding your first service so customers can find and book you.</p>
+    <a href="{% url 'services:add_service' %}" class="btn btn-primary mt-2">
+      <i class="fa-solid fa-plus me-1"></i>Add Your First Service
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

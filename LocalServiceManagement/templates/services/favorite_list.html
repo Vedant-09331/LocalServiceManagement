@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}My Favorites{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4 text-center">
+        ❤️ My Favorite Services
+    </h2>
+
+    <div class="row g-4">
+
+        {% for fav in favorites %}
+        <div class="col-md-4">
+
+            <div class="card h-100 shadow-sm service-card">
+
+                {% if fav.service.image %}
+                <img src="{{ fav.service.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+                {% else %}
+                <img src="https://via.placeholder.com/300x200" class="card-img-top">
+                {% endif %}
+
+                <div class="card-body text-center">
+
+                    <h5 class="fw-bold">
+                        {{ fav.service.name }}
+                    </h5>
+
+                    <p class="text-muted small">
+                        {{ fav.service.description|truncatewords:12 }}
+                    </p>
+
+                    <p class="text-primary fw-bold">
+                        ₹{{ fav.service.price }}
+                    </p>
+
+                    <a href="{% url 'services:service_detail' fav.service.id %}" 
+                       class="btn btn-primary btn-sm w-100">
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+        {% empty %}
+
+        <div class="text-center mt-5">
+            <h4>No favorite services yet 😔</h4>
+            <p class="text-muted">Start exploring and add some services!</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<style>
+.service-card{
+    border-radius:12px;
+    transition:0.3s;
+}
+.service-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 30px rgba(0,0,0,0.1);
+}
+</style>
+
+{% endblock %}

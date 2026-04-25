@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+
+<section class="hero">
+
+<div class="hero-overlay"></div>
+
+<div class="container hero-content">
+
+<div class="row align-items-center">
+
+<div class="col-md-6">
+
+<h1 class="hero-title">
+Premium Home Services <br>
+<span>At Your Doorstep</span>
+</h1>
+
+<p class="hero-subtitle">
+Book trusted professionals for cleaning, repair, beauty and more in seconds.
+</p>
+
+<form method="get" action="{% url 'services:services_list' %}" class="hero-search">
+
+<div class="input-group">
+
+<input type="text" name="q" class="form-control" placeholder="Search for services...">
+
+<button class="btn hero-btn">
+Search
+</button>
+
+</div>
+
+</form>
+
+<a href="{% url 'services:services_list' %}" class="btn btn-outline-light explore-btn">
+Explore Services
+</a>
+
+</div>
+
+<div class="col-md-6 text-center">
+
+<div class="hero-illustration">
+  <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+    <!-- Background Circle -->
+    <circle cx="250" cy="200" r="170" fill="rgba(255,255,255,0.1)"/>
+    <circle cx="250" cy="200" r="130" fill="rgba(255,255,255,0.08)"/>
+
+    <!-- House -->
+    <polygon points="250,60 130,150 370,150" fill="#ffe082" stroke="white" stroke-width="2"/>
+    <rect x="160" y="150" width="180" height="130" rx="5" fill="white" opacity="0.95"/>
+    <rect x="175" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
+    <rect x="275" y="165" width="50" height="45" rx="3" fill="#90caf9"/>
+    <rect x="220" y="220" width="60" height="60" rx="3" fill="#a5d6a7"/>
+    <circle cx="270" cy="250" r="4" fill="#666"/>
+
+    <!-- Chimney -->
+    <rect x="300" y="80" width="25" height="70" rx="3" fill="#bcaaa4"/>
+
+    <!-- Worker -->
+    <circle cx="110" cy="260" r="22" fill="#ffcc80"/>
+    <rect x="90" y="282" width="40" height="55" rx="5" fill="#42a5f5"/>
+    <rect x="85" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
+    <rect x="115" y="337" width="20" height="30" rx="3" fill="#1565c0"/>
+    <!-- Hard Hat -->
+    <ellipse cx="110" cy="242" rx="26" ry="10" fill="#fdd835"/>
+    <rect x="96" y="235" width="28" height="8" rx="2" fill="#f9a825"/>
+    <!-- Wrench -->
+    <line x1="130" y1="295" x2="160" y2="270" stroke="#78909c" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="163" cy="267" r="8" fill="none" stroke="#78909c" stroke-width="3"/>
+
+    <!-- Sparkles -->
+    <text x="370" y="120" font-size="28" fill="#ffe082" opacity="0.9">✨</text>
+    <text x="90" y="130" font-size="22" fill="#ffe082" opacity="0.7">⭐</text>
+    <text x="390" y="250" font-size="20" fill="white" opacity="0.6">✦</text>
+
+    <!-- Tools -->
+    <rect x="370" y="290" width="60" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <text x="380" y="308" font-size="12" fill="white" font-weight="600">🔧🔨🪛</text>
+  </svg>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- STATS SECTION -->
+
+<section class="stats">
+
+<div class="container">
+
+<div class="row text-center">
+
+<div class="col-md-3">
+<h2>500+</h2>
+<p>Professionals</p>
+</div>
+
+<div class="col-md-3">
+<h2>1200+</h2>
+<p>Happy Customers</p>
+</div>
+
+<div class="col-md-3">
+<h2>50+</h2>
+<p>Services</p>
+</div>
+
+<div class="col-md-3">
+<h2>4.8⭐</h2>
+<p>Average Rating</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SERVICES SECTION -->
+
+<section class="services-section">
+
+<div class="container">
+
+<h2 class="section-title">
+Popular Services
+</h2>
+
+<div class="row g-4">
+
+{% for service in services %}
+
+<div class="col-md-3">
+
+<div class="service-card">
+
+{% if service.image %}
+<img src="{{ service.image.url }}">
+{% endif %}
+
+<div class="service-info">
+
+<h5>{{ service.title }}</h5>
+
+<p>{{ service.description|truncatewords:12 }}</p>
+
+<span class="price">₹{{ service.price }}</span>
+
+<div class="d-flex justify-content-center gap-2 mt-2">
+<a href="{% url 'services:service_detail' service.id %}" class="btn view-btn">
+View Service
+</a>
+{% if user.is_authenticated %}
+<a href="{% url 'cart:add_to_cart' service.id %}" class="btn btn-primary btn-sm" style="border-radius:25px;">
+<i class="fa-solid fa-cart-plus"></i>
+</a>
+{% endif %}
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="col-12 text-center">
+<h4>No services available</h4>
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- FEATURES -->
+
+<section class="features">
+
+<div class="container">
+
+<h2 class="section-title">
+Why Choose Us
+</h2>
+
+<div class="row text-center">
+
+<div class="col-md-4">
+
+<div class="feature-card">
+
+<i class="fa-solid fa-user-check"></i>
+
+<h5>Verified Professionals</h5>
+
+<p>All professionals are background checked and trained.</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="feature-card">
+
+<i class="fa-solid fa-clock"></i>
+
+<h5>On Time Service</h5>
+
+<p>Fast booking and quick arrival at your home.</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="feature-card">
+
+<i class="fa-solid fa-star"></i>
+
+<h5>Top Rated</h5>
+
+<p>Thousands of satisfied customers with great reviews.</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CTA -->
+
+<section class="cta">
+
+<div class="container text-center">
+
+<h2>Need a service today?</h2>
+
+<p>Book trusted professionals in seconds.</p>
+
+<a href="{% url 'services:services_list' %}" class="btn cta-btn">
+Browse Services
+</a>
+
+</div>
+
+</section>
+
+
+<style>
+
+/* HERO */
+
+.hero{
+position:relative;
+background: linear-gradient(135deg,#4e73df,#1cc88a,#36b9cc);
+padding:120px 0;
+color:white;
+overflow:hidden;
+}
+
+.hero-overlay{
+position:absolute;
+width:500px;
+height:500px;
+background:rgba(255,255,255,0.1);
+filter:blur(100px);
+border-radius:50%;
+top:-150px;
+right:-150px;
+}
+
+.hero-title{
+font-size:55px;
+font-weight:700;
+}
+
+.hero-title span{
+color:#ffe082;
+}
+
+.hero-subtitle{
+font-size:18px;
+margin-top:15px;
+opacity:0.9;
+}
+
+.hero-search{
+margin-top:30px;
+}
+
+.hero-search input{
+height:55px;
+border-radius:10px 0 0 10px;
+}
+
+.hero-btn{
+background:white;
+color:#4e73df;
+font-weight:600;
+border-radius:0 10px 10px 0;
+}
+
+.hero-btn:hover{
+background:#f8f9fa;
+}
+
+.explore-btn{
+margin-top:15px;
+border-radius:30px;
+}
+
+.hero-illustration{
+max-width:100%;
+animation: float 5s ease-in-out infinite;
+}
+
+
+/* FLOAT ANIMATION */
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-20px)}
+100%{transform:translateY(0)}
+}
+
+
+/* STATS */
+
+.stats{
+background:#f8f9fc;
+padding:60px 0;
+}
+
+.stats h2{
+font-size:40px;
+font-weight:700;
+color:#4e73df;
+}
+
+
+/* SERVICES */
+
+.services-section{
+padding:80px 0;
+}
+
+.section-title{
+text-align:center;
+font-weight:700;
+margin-bottom:50px;
+}
+
+.service-card{
+background:white;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+transition:0.4s;
+}
+
+.service-card:hover{
+transform:translateY(-10px);
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+.service-card img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+.service-info{
+padding:20px;
+text-align:center;
+}
+
+.price{
+display:block;
+font-weight:700;
+color:#4e73df;
+margin:10px 0;
+}
+
+.view-btn{
+border:1px solid #4e73df;
+color:#4e73df;
+border-radius:25px;
+}
+
+.view-btn:hover{
+background:#4e73df;
+color:white;
+}
+
+
+/* FEATURES */
+
+.features{
+background:#f8f9fc;
+padding:80px 0;
+}
+
+.feature-card{
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+.feature-card:hover{
+transform:translateY(-8px);
+}
+
+.feature-card i{
+font-size:40px;
+color:#4e73df;
+margin-bottom:15px;
+}
+
+
+/* CTA */
+
+.cta{
+background: linear-gradient(135deg,#1cc88a,#4e73df);
+padding:80px 0;
+color:white;
+}
+
+.cta-btn{
+background:white;
+color:#4e73df;
+border-radius:30px;
+font-weight:600;
+}
+
+.cta-btn:hover{
+background:#f8f9fa;
+}
+
+</style>
+
+{% endblock %}

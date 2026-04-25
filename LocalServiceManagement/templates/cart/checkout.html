@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout — Pay with Razorpay{% endblock %}
+
+{% block hero %}{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <div class="checkout-card">
+
+        <div class="text-center mb-4">
+          <i class="fa-solid fa-lock fa-2x text-primary mb-2"></i>
+          <h3 class="fw-bold">Secure Checkout</h3>
+          <p class="text-muted">Review your order and proceed to payment</p>
+        </div>
+
+        <hr>
+
+        <!-- ORDER ITEMS -->
+        {% for item in items %}
+        <div class="d-flex justify-content-between align-items-center py-2">
+          <div>
+            <strong>{{ item.service.name }}</strong>
+            <span class="text-muted small ms-1">x{{ item.quantity }}</span>
+          </div>
+          <span class="fw-bold">₹{{ item.subtotal }}</span>
+        </div>
+        {% endfor %}
+
+        <hr>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <span class="fs-5 fw-bold">Total Payable</span>
+          <span class="fs-4 fw-bold text-primary">₹{{ total }}</span>
+        </div>
+
+        <!-- RAZORPAY BUTTON -->
+        <button id="rzp-button" class="btn btn-primary w-100 py-3 fw-bold rounded-pill fs-5">
+          <i class="fa-solid fa-credit-card me-2"></i> Pay ₹{{ total }}
+        </button>
+
+        <p class="text-center text-muted small mt-3">
+          <i class="fa-solid fa-shield-halved me-1"></i> Payments are processed securely by Razorpay
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+.checkout-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  var options = {
+    "key": "{{ razorpay_key_id }}",
+    "amount": "{{ amount_paise }}",
+    "currency": "INR",
+    "name": "Local Services",
+    "description": "Service Booking Payment",
+    "order_id": "{{ razorpay_order_id }}",
+    "handler": function (response) {
+      // Submit payment details to our server
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = "{% url 'cart:payment_callback' %}";
+
+      var csrf = document.createElement('input');
+      csrf.type = 'hidden';
+      csrf.name = 'csrfmiddlewaretoken';
+      csrf.value = '{{ csrf_token }}';
+      form.appendChild(csrf);
+
+      var fields = {
+        'razorpay_payment_id': response.razorpay_payment_id,
+        'razorpay_order_id': response.razorpay_order_id,
+        'razorpay_signature': response.razorpay_signature,
+      };
+
+      for (var key in fields) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+    },
+    "prefill": {
+      "email": "{{ user_email }}"
+    },
+    "theme": {
+      "color": "#2563eb"
+    }
+  };
+
+  var rzp = new Razorpay(options);
+
+  document.getElementById('rzp-button').onclick = function(e) {
+    rzp.open();
+    e.preventDefault();
+  };
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block hero %}{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+
+      <div class="success-card text-center">
+
+        <div class="success-icon-wrap mb-4">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <h2 class="fw-bold text-success mb-2">Payment Successful!</h2>
+        <p class="text-muted mb-4">Your bookings have been confirmed. The service providers have been notified.</p>
+
+        <div class="text-start mb-4">
+          <h6 class="fw-bold mb-3">Bookings Created:</h6>
+          {% for booking in bookings %}
+          <div class="d-flex justify-content-between align-items-center py-2 px-3 mb-2" style="background:#f0fdf4; border-radius:10px;">
+            <div>
+              <strong>{{ booking.service.name }}</strong>
+              <br>
+              <small class="text-muted">Booking #{{ booking.id }}</small>
+            </div>
+            <span class="badge bg-success rounded-pill px-3 py-2">Confirmed</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-between mb-4">
+          <span class="fw-bold">Total Paid</span>
+          <span class="fw-bold text-primary fs-5">₹{{ total }}</span>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-center">
+          <a href="{% url 'bookings:booking_history' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="fa-solid fa-calendar-check me-1"></i> My Bookings
+          </a>
+          <a href="{% url 'services:services_list' %}" class="btn btn-outline-primary rounded-pill px-4">
+            Browse More
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.success-card {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 36px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+.success-icon-wrap i {
+  font-size: 72px;
+  color: #22c55e;
+  animation: popIn 0.6s ease;
+}
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
+
+{% endblock %}

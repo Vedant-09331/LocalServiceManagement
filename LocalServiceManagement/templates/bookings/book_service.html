@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ service.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    
+    <div class="col-lg-10">
+      <div class="card shadow-lg rounded-4 overflow-hidden">
+
+        <div class="row g-0">
+
+          <!-- LEFT IMAGE -->
+          <div class="col-md-5">
+            {% if service.image %}
+            <img src="{{ service.image.url }}" class="img-fluid h-100 w-100 object-fit-cover">
+            {% else %}
+            <img src="https://via.placeholder.com/500x500" class="img-fluid h-100 w-100 object-fit-cover">
+            {% endif %}
+          </div>
+
+          <!-- RIGHT CONTENT -->
+          <div class="col-md-7 p-4 position-relative">
+
+            <h2 class="fw-bold">{{ service.name }}</h2>
+
+            <!-- PROFESSIONAL -->
+            <div class="d-flex align-items-center mb-3">
+              {% if professional.photo %}
+              <img src="{{ professional.photo.url }}" class="rounded-circle me-3" width="60" height="60">
+              {% else %}
+              <img src="https://via.placeholder.com/60" class="rounded-circle me-3">
+              {% endif %}
+              <div>
+                <h6 class="mb-0 fw-bold">{{ professional.name }}</h6>
+                <small class="text-muted">{{ professional.experience }} yrs experience</small>
+                <div class="text-warning">
+                  ★ {{ professional.rating }}
+                </div>
+              </div>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <p class="text-muted">
+              {{ service.description|truncatechars:200 }}
+            </p>
+
+            <!-- PRICE -->
+            <h4 class="text-primary fw-bold mb-4">₹{{ service.price }}</h4>
+
+            <!-- FORM -->
+            <form method="POST">
+              {% csrf_token %}
+
+              <div class="row g-3 mb-3">
+
+                <!-- ✅ DATE PICKER -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Select Date</label>
+                  <input 
+                    type="text" 
+                    id="booking_date" 
+                    name="booking_date"
+                    class="form-control shadow-sm rounded-3"
+                    placeholder="Select Date"
+                    required
+                  >
+                </div>
+
+                <!-- TIME -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Select Time</label>
+                  <input 
+                    type="time" 
+                    name="booking_time" 
+                    class="form-control shadow-sm rounded-3"
+                    required
+                  >
+                </div>
+
+              </div>
+
+              <!-- ADDRESS -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Service Address</label>
+                <textarea 
+                  name="address" 
+                  class="form-control rounded-3"
+                  rows="3"
+                  placeholder="Enter full address"
+                  required></textarea>
+              </div>
+
+              <!-- BUTTON -->
+              <button type="submit" class="btn btn-success btn-lg w-100 shadow">
+                Confirm Booking
+              </button>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Flatpickr date picker -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  flatpickr("#booking_date", {
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d-m-Y",
+    minDate: "today",
+    disableMobile: true
+  });
+</script>
+{% endblock %}

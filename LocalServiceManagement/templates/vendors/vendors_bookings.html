@@ -1,0 +1,8 @@
+<h2>All Bookings</h2>
+
+{% for booking in bookings %}
+<div class="card p-3 mb-2">
+  <p>{{ booking.service.name }}</p>
+  <p>{{ booking.status }}</p>
+</div>
+{% endfor %}

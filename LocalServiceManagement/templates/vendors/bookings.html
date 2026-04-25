@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>My Bookings</h2>
+
+    {% if bookings %}
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>User</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th> <!-- ✅ NEW COLUMN -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.service.name }}</td>
+                    <td>{{ booking.user.username }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.status }}</td>
+
+                    <!-- ✅ NEW ACTION BUTTONS -->
+                    <td>
+                        {% if booking.status == "Pending" %}
+                            <a href="{% url 'accept_booking' booking.id %}" class="btn btn-success btn-sm">Accept</a>
+                            <a href="{% url 'reject_booking' booking.id %}" class="btn btn-danger btn-sm">Reject</a>
+                        {% else %}
+                            <span class="text-muted">No action</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No bookings yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

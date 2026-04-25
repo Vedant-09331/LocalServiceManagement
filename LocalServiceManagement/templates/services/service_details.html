@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- SERVICE DETAILS -->
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h2 class="mb-3">{{ service.name }}</h2>
+
+            {% if service.image %}
+                <img src="{{ service.image.url }}" class="img-fluid mb-3" style="max-height:300px;">
+            {% endif %}
+
+            <p>{{ service.description }}</p>
+
+            <p><strong>Price:</strong> ₹{{ service.price }}</p>
+
+            <!-- ❤️ FAVORITE BUTTON -->
+            <a href="{% url 'services:toggle_favorite' service.id %}"
+               class="btn {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %} mb-3">
+
+               {% if is_favorite %}
+                   ❤️ Remove from Favorites
+               {% else %}
+                   🤍 Add to Favorites
+               {% endif %}
+
+            </a>
+
+        </div>
+    </div>
+
+
+    <!-- ⭐ REVIEWS SECTION -->
+
+    <h3 class="fw-bold mb-4">Customer Reviews</h3>
+
+    {% for review in reviews %}
+
+    <div class="card mb-3 review-card">
+        <div class="card-body">
+
+            <strong>{{ review.user.username }}</strong>
+
+            <!-- ⭐ STAR RATING -->
+            <p class="text-warning">
+
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                    ★
+                {% else %}
+                    ☆
+                {% endif %}
+            {% endfor %}
+
+            </p>
+
+            <p>{{ review.comment }}</p>
+
+            {% if review.user == request.user %}
+                <a href="{% url 'services:edit_review' review.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'services:delete_review' review.id %}" class="btn btn-sm btn-danger">Delete</a>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% empty %}
+        <p>No reviews yet.</p>
+    {% endfor %}
+
+    <!-- ADD REVIEW BUTTON -->
+    <a href="{% url 'services:add_review' service.id %}" class="btn btn-primary mt-3">
+        Write a Review
+    </a>
+
+</div>
+
+{% endblock %}

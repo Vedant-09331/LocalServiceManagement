@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Service Details{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<!-- SERVICE HEADER -->
+<div class="row mb-5 align-items-center">
+
+<div class="col-md-6">
+{% if service.image %}
+<img src="{{ service.image.url }}" class="img-fluid rounded shadow service-img">
+{% else %}
+<img src="https://via.placeholder.com/600x400" class="img-fluid rounded shadow">
+{% endif %}
+</div>
+
+<div class="col-md-6">
+
+<h2 class="fw-bold">{{ service.name }}</h2>
+
+<p class="text-muted mt-3">
+{{ service.description }}
+</p>
+
+<h3 class="text-primary fw-bold">
+₹{{ service.price }}
+</h3>
+
+<!-- Rating -->
+<div class="d-flex align-items-center gap-2 mb-2">
+    <span class="fs-4 fw-bold text-warning">{{ service.rating|floatformat:1 }}</span>
+    <span class="text-warning fs-5">
+        {% for i in "12345" %}
+            {% if forloop.counter <= service.rating %}
+                ★
+            {% else %}
+                ☆
+            {% endif %}
+        {% endfor %}
+    </span>
+    <span class="text-muted fs-6">({{ service.rating_count }} review{{ service.rating_count|pluralize }})</span>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="mt-4 d-flex gap-3 flex-wrap">
+
+<a href="{% url 'bookings:book_service' service.id %}" 
+class="btn btn-primary btn-lg px-4">
+Book Now
+</a>
+
+<a href="{% url 'cart:add_to_cart' service.id %}" 
+class="btn btn-outline-primary btn-lg px-4">
+<i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
+</a>
+
+<a href="{% url 'services:toggle_favorite' service.id %}" 
+class="btn btn-lg {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %}">
+{% if is_favorite %}
+❤️ Saved
+{% else %}
+🤍 Save
+{% endif %}
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- SERVICE HIGHLIGHTS (NEW FEATURE) -->
+<div class="row text-center mb-5">
+
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>⚡ Fast Service</h5>
+<p class="text-muted small">Quick and reliable service at your doorstep</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>✅ Verified Experts</h5>
+<p class="text-muted small">Trained & background-checked professionals</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="highlight-box p-4">
+<h5>🔒 Secure Payment</h5>
+<p class="text-muted small">100% safe and secure transactions</p>
+</div>
+</div>
+
+</div>
+
+<!-- CUSTOMER REVIEWS -->
+<div class="mt-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">Customer Reviews</h3>
+    {% if user.is_authenticated %}
+    <a href="{% url 'services:add_review' service.id %}" class="btn btn-outline-primary btn-sm">
+        <i class="fa-solid fa-pen me-1"></i> Write a Review
+    </a>
+    {% endif %}
+</div>
+
+{% for review in reviews %}
+
+<div class="card mb-3 review-card">
+
+<div class="card-body">
+
+<div class="d-flex justify-content-between align-items-start">
+    <div>
+        <strong>{{ review.user.username }}</strong>
+        <small class="text-muted ms-2">{{ review.created_at|date:"M d, Y" }}</small>
+    </div>
+    <span class="text-warning fs-6">
+        {% for i in "12345" %}
+            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+        {% endfor %}
+        <span class="text-muted ms-1 small">{{ review.rating }}/5</span>
+    </span>
+</div>
+
+<p class="text-muted mt-2 mb-0">
+{{ review.comment }}
+</p>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="text-center text-muted py-4">
+<h5>No reviews yet 😕</h5>
+<p>Be the first to review this service!</p>
+{% if user.is_authenticated %}
+<a href="{% url 'services:add_review' service.id %}" class="btn btn-primary mt-2">Write a Review</a>
+{% endif %}
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- CUSTOM STYLES -->
+<style>
+
+.service-img{
+transition:0.3s;
+}
+.service-img:hover{
+transform:scale(1.05);
+}
+
+/* Highlight Section */
+.highlight-box{
+border-radius:12px;
+background:#f8f9fa;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+transition:0.3s;
+}
+.highlight-box:hover{
+transform:translateY(-5px);
+}
+
+/* Review Cards */
+.review-card{
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+transition:0.3s;
+}
+.review-card:hover{
+transform:scale(1.01);
+}
+
+</style>
+
+{% endblock %}

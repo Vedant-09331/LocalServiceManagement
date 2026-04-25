@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}My Profile | Vendor Portal{% endblock %}
+
+{% block content %}
+<style>
+.vp-wrap { font-family:'Poppins',sans-serif; }
+.vp-hero {
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  border-radius: 20px;
+  padding: 30px 32px;
+  color: white;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.vp-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.vp-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255,255,255,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.vp-avatar-placeholder {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  border: 4px solid rgba(255,255,255,0.4);
+}
+.vp-hero-info h2 { font-weight:700; margin:0; font-size:1.5rem; }
+.vp-hero-info .sub { opacity:0.8; font-size:0.9rem; margin-top:4px; }
+.vp-badge-row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.vp-badge {
+  font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:20px;
+  background:rgba(255,255,255,0.2);
+}
+.vp-badge.verified { background:#22c55e33; color:#86efac; }
+.vp-badge.unverified { background:#f59e0b33; color:#fde68a; }
+.vp-badge.available { background:#3b82f633; color:#93c5fd; }
+
+.vp-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  padding: 28px 30px;
+  margin-bottom: 24px;
+}
+.vp-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e2a4a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+.vp-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.vp-nav a {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: white;
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: 0.2s;
+}
+.vp-nav a:hover, .vp-nav a.active {
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color: white;
+}
+.form-label { font-weight:600; font-size:0.88rem; color:#374151; }
+.form-control { border-radius:10px; border:1.5px solid #e2e8f0; font-size:0.9rem; }
+.form-control:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
+.btn-save {
+  background: linear-gradient(135deg,#2d3a5f,#3b4f83);
+  color: white; border:none; border-radius:12px;
+  padding:11px 32px; font-size:0.95rem; font-weight:600;
+  cursor:pointer; transition:0.25s; letter-spacing:0.3px;
+}
+.btn-save:hover { opacity:0.88; }
+.preview-img {
+  width:80px; height:80px; border-radius:50%; object-fit:cover;
+  border:3px solid #e2e8f0; display:none; margin-top:10px;
+}
+</style>
+
+<div class="vp-wrap">
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show rounded-3" role="alert">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Hero -->
+  <div class="vp-hero">
+    <div class="vp-avatar-wrap">
+      {% if vendor.profile_image %}
+        <img src="{{ vendor.profile_image.url }}" class="vp-avatar" alt="Profile">
+      {% else %}
+        <div class="vp-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+      {% endif %}
+    </div>
+    <div class="vp-hero-info">
+      <h2>{{ vendor.user.get_full_name|default:vendor.user.email }}</h2>
+      <div class="sub">{{ vendor.user.email }}</div>
+      <div class="vp-badge-row">
+        <span class="vp-badge {% if vendor.is_verified %}verified{% else %}unverified{% endif %}">
+          {% if vendor.is_verified %}<i class="fa-solid fa-circle-check me-1"></i>Verified{% else %}<i class="fa-solid fa-clock me-1"></i>Pending Verification{% endif %}
+        </span>
+        <span class="vp-badge available">
+          {% if vendor.is_available %}<i class="fa-solid fa-wifi me-1"></i>Available{% else %}<i class="fa-solid fa-ban me-1"></i>Offline{% endif %}
+        </span>
+        <span class="vp-badge">
+          <i class="fa-solid fa-briefcase me-1"></i>{{ vendor.experience }} yr{% if vendor.experience != 1 %}s{% endif %} exp
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="vp-nav">
+    <a href="{% url 'vendors:vendor_dashboard' %}"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
+    <a href="{% url 'vendors:vendor_profile' %}" class="active"><i class="fa-solid fa-user-pen me-1"></i>Profile</a>
+    <a href="{% url 'vendors:vendor_my_services' %}"><i class="fa-solid fa-screwdriver-wrench me-1"></i>My Services</a>
+    <a href="{% url 'vendors:vendor_bookings' %}"><i class="fa-solid fa-calendar-check me-1"></i>Bookings</a>
+    <a href="{% url 'vendors:vendor_earnings' %}"><i class="fa-solid fa-chart-line me-1"></i>Earnings</a>
+    <a href="{% url 'vendors:vendor_reviews' %}"><i class="fa-solid fa-star me-1"></i>Reviews</a>
+  </div>
+
+  <!-- Profile Form -->
+  <div class="vp-card">
+    <div class="vp-card-title"><i class="fa-solid fa-user-pen me-2 text-primary"></i>Edit Profile</div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">First Name</label>
+          <input type="text" name="first_name" class="form-control"
+                 value="{{ vendor.user.first_name }}" placeholder="First name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name</label>
+          <input type="text" name="last_name" class="form-control"
+                 value="{{ vendor.user.last_name }}" placeholder="Last name">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" value="{{ vendor.user.email }}" disabled>
+          <div class="form-text text-muted">Email cannot be changed here.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Experience (years)</label>
+          {{ form.experience }}
+          {% if form.experience.errors %}<div class="text-danger small">{{ form.experience.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Profile Picture</label>
+          {{ form.profile_image }}
+          {% if vendor.profile_image %}
+            <div class="mt-2">
+              <img src="{{ vendor.profile_image.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;">
+              <small class="text-muted ms-2">Current photo</small>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Bio / About Me</label>
+          {{ form.bio }}
+          {% if form.bio.errors %}<div class="text-danger small">{{ form.bio.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-12">
+          <div class="form-check">
+            {{ form.is_available }}
+            <label class="form-check-label fw-semibold" style="font-size:0.9rem;">
+              Mark me as Available for new bookings
+            </label>
+          </div>
+        </div>
+
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn-save">
+            <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

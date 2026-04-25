@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Complete Your Payment</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Booking Details</h5>
+                            <p><strong>Service:</strong> {{ booking.service.title }}</p>
+                            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+                            <p><strong>Time:</strong> {{ booking.booking_time|default:"TBD" }}</p>
+                            <p><strong>Address:</strong> {{ booking.address }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Payment Details</h5>
+                            <p><strong>Amount:</strong> ₹{{ payment.amount }}</p>
+                            <p><strong>Status:</strong>
+                                <span class="badge bg-warning">{{ payment.get_payment_status_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> This is a demo payment system. In production, this would integrate with a real payment gateway like Razorpay, Stripe, or PayPal.
+                    </div>
+
+                    <form method="post" action="{% url 'payments:process_payment' booking.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <select name="payment_method" class="form-control" required>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="upi">UPI</option>
+                                <option value="netbanking">Net Banking</option>
+                                <option value="cash">Cash on Delivery</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            Pay ₹{{ payment.amount }}
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

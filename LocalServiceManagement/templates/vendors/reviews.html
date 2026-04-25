@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Reviews | Vendor Portal{% endblock %}
+
+{% block content %}
+<style>
+.vr-wrap { font-family:'Poppins',sans-serif; }
+.vr-topbar {
+  background:linear-gradient(135deg,#d97706,#f59e0b);
+  color:white; padding:20px 28px; border-radius:18px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; box-shadow:0 8px 30px rgba(217,119,6,0.3);
+}
+.vr-topbar h4 { font-weight:700; margin:0; font-size:1.2rem; }
+.vr-nav {
+  display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;
+}
+.vr-nav a {
+  padding:8px 18px; border-radius:10px; font-size:0.85rem; font-weight:600;
+  text-decoration:none; background:white; color:#475569;
+  box-shadow:0 2px 8px rgba(0,0,0,0.07); transition:0.2s;
+}
+.vr-nav a:hover, .vr-nav a.active {
+  background:linear-gradient(135deg,#2d3a5f,#3b4f83); color:white;
+}
+.vr-summary {
+  display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px;
+}
+.vr-sum-card {
+  flex:1; min-width:160px; background:white; border-radius:16px;
+  padding:22px 20px; box-shadow:0 4px 18px rgba(0,0,0,0.08);
+  text-align:center;
+}
+.vr-sum-val { font-size:2rem; font-weight:700; color:#1e293b; }
+.vr-sum-lbl { font-size:0.8rem; font-weight:500; color:#64748b; margin-top:2px; }
+.stars { color:#f59e0b; font-size:1.1rem; }
+.review-card {
+  background:white; border-radius:16px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.07);
+  padding:20px 24px; margin-bottom:16px;
+  transition:box-shadow 0.2s;
+}
+.review-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.11); }
+.rc-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.rc-avatar {
+  width:42px; height:42px; border-radius:50%;
+  background:linear-gradient(135deg,#2d3a5f,#3b4f83);
+  display:flex; align-items:center; justify-content:center;
+  color:white; font-size:1rem; font-weight:700; flex-shrink:0;
+}
+.rc-name { font-weight:700; font-size:0.95rem; color:#1e293b; }
+.rc-date { font-size:0.8rem; color:#94a3b8; }
+.rc-service {
+  display:inline-block; background:#dbeafe; color:#2563eb;
+  font-size:0.75rem; font-weight:600; padding:3px 10px;
+  border-radius:8px; margin-bottom:8px;
+}
+.rc-stars { margin-bottom:6px; }
+.rc-comment { font-size:0.88rem; color:#475569; line-height:1.6; }
+.vr-empty { text-align:center; padding:50px 20px; color:#94a3b8;
+  background:white; border-radius:18px; box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+.vr-empty i { font-size:3rem; display:block; margin-bottom:14px; }
+</style>
+
+<div class="vr-wrap">
+
+  <!-- Top bar -->
+  <div class="vr-topbar">
+    <h4><i class="fa-solid fa-star me-2"></i>Reviews & Ratings</h4>
+    <span style="font-size:0.85rem;opacity:0.85;">{{ total_reviews }} review{{ total_reviews|pluralize }}</span>
+  </div>
+
+  <!-- Nav -->
+  <div class="vr-nav">
+    <a href="{% url 'vendors:vendor_dashboard' %}"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
+    <a href="{% url 'vendors:vendor_profile' %}"><i class="fa-solid fa-user-pen me-1"></i>Profile</a>
+    <a href="{% url 'vendors:vendor_my_services' %}"><i class="fa-solid fa-screwdriver-wrench me-1"></i>My Services</a>
+    <a href="{% url 'vendors:vendor_bookings' %}"><i class="fa-solid fa-calendar-check me-1"></i>Bookings</a>
+    <a href="{% url 'vendors:vendor_earnings' %}"><i class="fa-solid fa-chart-line me-1"></i>Earnings</a>
+    <a href="{% url 'vendors:vendor_reviews' %}" class="active"><i class="fa-solid fa-star me-1"></i>Reviews</a>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="vr-summary">
+    <div class="vr-sum-card">
+      <div class="vr-sum-val">{{ total_reviews }}</div>
+      <div class="vr-sum-lbl">Total Reviews</div>
+    </div>
+    <div class="vr-sum-card">
+      <div class="vr-sum-val">{{ avg_rating }}<span style="font-size:1rem;color:#94a3b8;">/5</span></div>
+      <div class="vr-sum-lbl">
+        <span class="stars">
+          {% for i in "12345" %}
+            {% if forloop.counter <= avg_rating %}
+              <i class="fa-solid fa-star"></i>
+            {% else %}
+              <i class="fa-regular fa-star"></i>
+            {% endif %}
+          {% endfor %}
+        </span>
+        Average Rating
+      </div>
+    </div>
+    <div class="vr-sum-card">
+      <div class="vr-sum-val">{{ vendor.total_jobs }}</div>
+      <div class="vr-sum-lbl">Jobs Completed</div>
+    </div>
+  </div>
+
+  <!-- Review list -->
+  {% if reviews %}
+    {% for review in reviews %}
+    <div class="review-card">
+      <div class="rc-header">
+        <div class="rc-avatar">
+          {{ review.user.get_full_name|default:review.user.email|first|upper }}
+        </div>
+        <div>
+          <div class="rc-name">{{ review.user.get_full_name|default:review.user.email }}</div>
+          <div class="rc-date">{{ review.created_at|date:"M j, Y" }}</div>
+        </div>
+        <div class="ms-auto text-end">
+          <div class="stars">
+            {% for i in "12345" %}
+              {% if forloop.counter <= review.rating %}
+                <i class="fa-solid fa-star" style="font-size:0.9rem;"></i>
+              {% else %}
+                <i class="fa-regular fa-star" style="font-size:0.9rem;color:#e2e8f0;"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <small style="color:#94a3b8;font-size:0.8rem;">{{ review.rating }}/5</small>
+        </div>
+      </div>
+      <div>
+        <span class="rc-service"><i class="fa-solid fa-screwdriver-wrench me-1"></i>{{ review.service.title|default:review.service.name }}</span>
+      </div>
+      {% if review.comment %}
+        <p class="rc-comment mb-0">{{ review.comment }}</p>
+      {% else %}
+        <p class="rc-comment mb-0 fst-italic" style="color:#cbd5e1;">No comment left.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="vr-empty">
+    <i class="fa-regular fa-star"></i>
+    <h5 style="color:#475569;font-weight:700;">No reviews yet</h5>
+    <p>Reviews will appear here once customers complete and rate their bookings.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

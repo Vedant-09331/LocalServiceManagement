@@ -1,0 +1,71 @@
+================================================================================
+🚀 FREE TIER DEPLOYMENT GUIDE: LOCAL SERVICE MANAGEMENT (RENDER)
+================================================================================
+
+Since Render's FREE TIER does not support Persistent Disks, we use Cloudinary
+to store your images for free. This ensures your images aren't deleted
+every time the server restarts.
+
+--------------------------------------------------------------------------------
+1. PRE-DEPLOYMENT CHECKLIST
+--------------------------------------------------------------------------------
+[ ] requirements.txt is updated with Cloudinary dependencies (done).
+[ ] Procfile is created in the root directory (done).
+[ ] Cloudinary Account is created (https://cloudinary.com - Free Tier).
+
+--------------------------------------------------------------------------------
+2. RENDER SETUP STEPS (FREE TIER)
+--------------------------------------------------------------------------------
+
+STEP A: Create PostgreSQL Database
+----------------------------------
+1. Log in to Render (https://dashboard.render.com).
+2. Create a "New PostgreSQL" database.
+3. Copy the "Internal Database URL" for the web service environment.
+
+STEP B: Create Web Service
+--------------------------
+1. Click "New" -> "Web Service".
+2. Connect your GitHub repository.
+3. Configuration:
+   - Name: local-service-management
+   - Environment: Python
+   - Build Command: pip install -r requirements.txt && cd LocalServiceManagement && python manage.py collectstatic --noinput && python manage.py migrate
+   - Start Command: cd LocalServiceManagement && gunicorn LocalServiceManagement.wsgi
+
+--------------------------------------------------------------------------------
+3. ENVIRONMENT VARIABLES (CRITICAL FOR FREE TIER)
+--------------------------------------------------------------------------------
+Go to the "Environment" tab in your Render Web Service and add these keys.
+Without Cloudinary keys, your images WILL BE DELETED on every restart.
+
+| Key                          | Value                                      |
+|------------------------------|--------------------------------------------|
+| DEBUG                        | False                                      |
+| SECRET_KEY                   | (Generate a long random string)             |
+| DATABASE_URL                 | (Your Internal PostgreSQL URL)             |
+| ALLOWED_HOSTS                | .onrender.com                               |
+| CLOUDINARY_STORAGE_NAME      | (From Cloudinary Dashboard - Cloud Name)   |
+| CLOUDINARY_STORAGE_API_KEY   | (From Cloudinary Dashboard - API Key)      |
+| CLOUDINARY_STORAGE_API_SECRET|(From Cloudinary Dashboard - API Secret)   |
+| RAZORPAY_KEY_ID              | (From your Razorpay Dashboard)             |
+| RAZORPAY_KEY_SECRET          | (From your Razorpay Dashboard)             |
+| GEMINI_API_KEY               | (From Google AI Studio)                    |
+| EMAIL_HOST_USER              | (Your Gmail)                               |
+| EMAIL_HOST_PASSWORD          | (Your Gmail App Password)                  |
+
+--------------------------------------------------------------------------------
+4. POST-DEPLOYMENT
+--------------------------------------------------------------------------------
+Once the build is successful:
+1. Open the "Shell" tab in Render.
+2. Run: cd LocalServiceManagement && python manage.py seed_data
+3. Your site is live at: https://your-app-name.onrender.com
+
+--------------------------------------------------------------------------------
+💡 WHY NO DISKS?
+--------------------------------------------------------------------------------
+Render's Free Tier has "Ephemeral Storage". This means anything saved in the 
+/media folder is wiped when the service spins down (after 15 mins of inactivity).
+By using Cloudinary, your images are stored externally and stay safe forever!
+================================================================================

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Exit on error
+set -o errexit
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Enter the project directory
+cd LocalServiceManagement
+
+# Convert static asset files
+python manage.py collectstatic --no-input
+
+# Apply any outstanding database migrations
+python manage.py migrate
+
+# Seed data and images (using get_or_create to avoid duplicates)
+python manage.py seed_data
