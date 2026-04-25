@@ -190,23 +190,24 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Use Cloudinary for storage in production
+if os.getenv('CLOUDINARY_URL') or os.getenv('CLOUDINARY_STORAGE_NAME'):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+    if not os.getenv('CLOUDINARY_URL'):
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': os.getenv('CLOUDINARY_STORAGE_NAME'),
+            'API_KEY': os.getenv('CLOUDINARY_STORAGE_API_KEY'),
+            'API_SECRET': os.getenv('CLOUDINARY_STORAGE_API_SECRET'),
+        }
+else:
+    if not DEBUG:
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media configuration
 MEDIA_URL = '/static/images/'
 MEDIA_ROOT = BASE_DIR / 'static' / 'images'
 
-# Use Cloudinary for media storage in production
-if os.getenv('CLOUDINARY_URL'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-elif os.getenv('CLOUDINARY_STORAGE_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_STORAGE_NAME'),
-        'API_KEY': os.getenv('CLOUDINARY_STORAGE_API_KEY'),
-        'API_SECRET': os.getenv('CLOUDINARY_STORAGE_API_SECRET'),
-    }
 
 
 # ======================
