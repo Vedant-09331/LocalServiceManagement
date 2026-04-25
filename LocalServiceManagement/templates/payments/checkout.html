@@ -29,24 +29,65 @@
                     <hr>
 
                     <div class="alert alert-info">
-                        <strong>Note:</strong> This is a demo payment system. In production, this would integrate with a real payment gateway like Razorpay, Stripe, or PayPal.
+                        <strong>Mode:</strong> {% if error %}<span class="text-danger">{{ error }}</span>{% else %}Live Razorpay Integration{% endif %}
                     </div>
 
+                    {% if order_id %}
+                    <!-- Real Razorpay Form -->
+                    <button id="rzp-button1" class="btn btn-success w-100 py-2 fw-bold">Pay ₹{{ payment.amount }}</button>
+                    
+                    <form action="{% url 'payments:process_payment' booking.id %}" method="POST" id="razorpay-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id" value="{{ order_id }}">
+                        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                    </form>
+
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                    <script>
+                        var options = {
+                            "key": "{{ razorpay_key_id }}",
+                            "amount": "{{ amount }}",
+                            "currency": "INR",
+                            "name": "Local Service Pro",
+                            "description": "Booking for {{ booking.service.title }}",
+                            "order_id": "{{ order_id }}",
+                            "handler": function (response){
+                                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                                document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                                document.getElementById('razorpay-form').submit();
+                            },
+                            "prefill": {
+                                "name": "{{ request.user.get_full_name }}",
+                                "email": "{{ request.user.email }}"
+                            },
+                            "theme": {
+                                "color": "#0047ab"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        document.getElementById('rzp-button1').onclick = function(e){
+                            rzp1.open();
+                            e.preventDefault();
+                        }
+                    </script>
+                    {% else %}
+                    <!-- Demo/Fallback Form -->
                     <form method="post" action="{% url 'payments:process_payment' booking.id %}">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label class="form-label">Payment Method</label>
+                            <label class="form-label">Payment Method (Demo Mode)</label>
                             <select name="payment_method" class="form-control" required>
-                                <option value="card">Credit/Debit Card</option>
-                                <option value="upi">UPI</option>
-                                <option value="netbanking">Net Banking</option>
+                                <option value="razorpay">Razorpay (Simulated)</option>
                                 <option value="cash">Cash on Delivery</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-success w-100">
-                            Pay ₹{{ payment.amount }}
+                            Pay ₹{{ payment.amount }} (Simulated)
                         </button>
                     </form>
+                    {% endif %}
 
                     <div class="text-center mt-3">
                         <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-secondary">Cancel</a>
