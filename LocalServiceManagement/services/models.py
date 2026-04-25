@@ -50,14 +50,8 @@ class Service(models.Model):
 
     @property
     def get_display_image(self):
-        # 1. Try to serve the uploaded image if it exists on disk/storage
         if self.image:
-            try:
-                # This checks if the file actually exists in storage
-                if self.image.storage.exists(self.image.name):
-                    return self.image.url
-            except Exception:
-                pass
+            return self.image.url
 
         # 2. Fallback to category-based static images
         mapping = {
@@ -81,6 +75,11 @@ class Service(models.Model):
         import urllib.parse
         encoded_name = urllib.parse.quote(self.name or self.title or 'Service')
         return f"https://placehold.co/600x400?text={encoded_name}"
+
+    def average_rating(self):
+        from django.db.models import Avg
+        return self.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+
 
 
 class Review(models.Model):
@@ -119,8 +118,6 @@ class ServiceImage(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-def average_rating(self):
-    return self.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
 
 class Favorite(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
