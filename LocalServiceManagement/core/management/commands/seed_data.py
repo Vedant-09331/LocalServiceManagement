@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.core.files.base import ContentFile
+from django.core.files import File
 from datetime import timedelta
 import random
-import requests
+import os
 
+from django.conf import settings
 from core.models import User
 from services.models import Category, Service, Review, Favorite
 from vendors.models import Vendor
@@ -14,10 +15,10 @@ from payments.models import Payment
 
 
 class Command(BaseCommand):
-    help = "Seeds the database with example data and real images from Unsplash."
+    help = "Seeds the database with example data using existing media files."
 
     def handle(self, *args, **options):
-        self.stdout.write("Seeding database with example data and images...\n")
+        self.stdout.write("Seeding database with example data and local images...\n")
 
         # --- 1. Users ---
         user, _ = User.objects.get_or_create(
@@ -79,7 +80,19 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Categories created"))
 
-        # --- 3. Services with Images ---
+        # --- 3. Services with Local Images ---
+        # Map categories to actual files in media/vendors/
+        image_map = {
+            'Cleaning': 'home_repairement.jpg',
+            'Plumbing': 'plumbering2.jpg',
+            'Electrical': 'hand-drawn-electrician-cartoon-illustration_23-2151046712.avif',
+            'AC Repair': 'istockphoto-1417833187-612x612_1.jpg',
+            'Painting': 'images.jpg',
+            'Carpentry': '2d6d0e31d02d7fc9cd2fb2310f49153c.jpg',
+            'Pest Control': 'beautiful-asian-woman-many-hand-260nw-1734917243.webp',
+            'Beauty & Spa': 'portrait-professional-beautician-cosmetologist-work-600nw-2620996373.webp',
+        }
+
         services_data = [
             {
                 'name': 'Premium Home Cleaning',
@@ -90,7 +103,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user,
                 'rating': 4.5,
                 'rating_count': 12,
-                'img_query': 'home-cleaning'
             },
             {
                 'name': 'Pipe Leak Repair',
@@ -101,7 +113,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user,
                 'rating': 4.2,
                 'rating_count': 8,
-                'img_query': 'plumbing'
             },
             {
                 'name': 'Full Home Wiring',
@@ -112,7 +123,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user,
                 'rating': 4.7,
                 'rating_count': 15,
-                'img_query': 'electrical-work'
             },
             {
                 'name': 'AC Service & Gas Refill',
@@ -123,7 +133,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user2,
                 'rating': 4.3,
                 'rating_count': 10,
-                'img_query': 'air-conditioner'
             },
             {
                 'name': 'Interior Wall Painting',
@@ -134,7 +143,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user2,
                 'rating': 4.6,
                 'rating_count': 7,
-                'img_query': 'painting-wall'
             },
             {
                 'name': 'Kitchen Cabinet Repair',
@@ -145,7 +153,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user2,
                 'rating': 4.0,
                 'rating_count': 5,
-                'img_query': 'carpentry'
             },
             {
                 'name': 'Termite Treatment',
@@ -156,7 +163,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user,
                 'rating': 4.4,
                 'rating_count': 9,
-                'img_query': 'pest-control'
             },
             {
                 'name': 'Bridal Makeup Package',
@@ -167,7 +173,6 @@ class Command(BaseCommand):
                 'vendor': vendor_user2,
                 'rating': 4.8,
                 'rating_count': 20,
-                'img_query': 'makeup-bridal'
             },
         ]
 
@@ -186,17 +191,28 @@ class Command(BaseCommand):
                 }
             )
             
-            # Add image if it doesn't have one
+            # Use local image file
             if created or not svc.image:
-                try:
-                    img_url = f"https://source.unsplash.com/featured/800x600?{sdata['img_query']}"
-                    response = requests.get(img_url, timeout=10)
-                    if response.status_code == 200:
-                        file_name = f"{sdata['img_query']}_{random.randint(100,999)}.jpg"
-                        svc.image.save(file_name, ContentFile(response.content), save=True)
-                        self.stdout.write(f"  + Added image for {svc.name}")
-                except Exception as e:
-                    self.stdout.write(self.style.WARNING(f"  ! Could not fetch image for {svc.name}: {e}"))
+                img_filename = image_map.get(sdata['category'])
+                if img_filename:
+                    # Look in multiple possible locations
+                    possible_paths = [
+                        os.path.join(settings.BASE_DIR, 'LocalServiceManagement', 'media', 'vendors', img_filename),
+                        os.path.join(settings.BASE_DIR, 'media', 'vendors', img_filename),
+                    ]
+                    
+                    found_path = None
+                    for p in possible_paths:
+                        if os.path.exists(p):
+                            found_path = p
+                            break
+                    
+                    if found_path:
+                        with open(found_path, 'rb') as f:
+                            svc.image.save(img_filename, File(f), save=True)
+                        self.stdout.write(f"  + Assigned local image {img_filename} to {svc.name}")
+                    else:
+                        self.stdout.write(self.style.WARNING(f"  ! Image file {img_filename} not found for {svc.name}"))
             
             created_services.append(svc)
 
@@ -372,10 +388,4 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Favorites created"))
 
-        self.stdout.write(self.style.SUCCESS("\nAll example data and images seeded successfully!\n"))
-        self.stdout.write("Test accounts:")
-        self.stdout.write("  user@test.com / testpassword123  (Customer)")
-        self.stdout.write("  user2@test.com / testpassword123  (Customer)")
-        self.stdout.write("  vendor@test.com / testpassword123  (Vendor)")
-        self.stdout.write("  vendor2@test.com / testpassword123  (Vendor)")
-        self.stdout.write("  admin@test.com / testpassword123  (Admin)")
+        self.stdout.write(self.style.SUCCESS("\nAll example data and local images seeded successfully!\n"))
