@@ -95,7 +95,7 @@ def chatbot_message(request):
         system_prompt = _build_context(request.user)
 
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.5-flash',
             contents=user_message,
             config=genai.types.GenerateContentConfig(
                 system_instruction=system_prompt,

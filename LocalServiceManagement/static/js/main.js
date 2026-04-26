@@ -313,4 +313,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // --- 11. Booking Date Picker ---
+    const bookingDateInput = document.querySelector('#booking_date');
+    if (bookingDateInput) {
+        flatpickr(bookingDateInput, {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disableMobile: "true", // Force custom picker on mobile
+        });
+    }
 });

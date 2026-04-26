@@ -52,7 +52,9 @@ class Service(models.Model):
     def get_display_image(self):
         if self.image:
             try:
-                return self.image.url
+                # Check if file exists on storage
+                if self.image.storage.exists(self.image.name):
+                    return self.image.url
             except Exception:
                 pass
 
@@ -68,7 +70,7 @@ class Service(models.Model):
             'beauty & spa': 'beauty_spa.webp',
         }
         
-        category_name = self.category.name.lower() if self.category else ''
+        category_name = self.category.name.lower().strip() if self.category else ''
         file_name = mapping.get(category_name)
         
         if file_name:

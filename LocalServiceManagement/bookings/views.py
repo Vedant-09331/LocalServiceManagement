@@ -28,6 +28,7 @@ def book_service(request, id):
         booking_date = request.POST.get("booking_date")
         booking_time = request.POST.get("booking_time")
         address = request.POST.get("address")
+        notes = request.POST.get("notes")
 
         if not booking_date or not address:
             messages.error(request, 'Please fill in all required fields.')
@@ -46,6 +47,7 @@ def book_service(request, id):
             booking_date=booking_date,
             booking_time=booking_time if booking_time else None,
             address=address,
+            notes=notes,
             status='pending',
         )
 

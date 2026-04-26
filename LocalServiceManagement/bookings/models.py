@@ -29,6 +29,7 @@ class Booking(models.Model):
     vendor = models.ForeignKey('vendors.Vendor', on_delete=models.SET_NULL, related_name='bookings', null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='unpaid')
+    notes = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,7 +42,7 @@ class Booking(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.email} - {self.service.title} ({self.status})"
+        return f"{self.user.email} - {self.service.name} ({self.status})"
 
 class Review(models.Model):
     booking = models.OneToOneField('Booking', on_delete=models.CASCADE)
